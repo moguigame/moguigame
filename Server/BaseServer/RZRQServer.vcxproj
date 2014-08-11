@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6019F048-A5DD-433F-A063-5C920A1C7B37}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>RZRQServer</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_USE_32BIT_TIME_T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\\..\\Develop SDK\Include;..\\..\\include\\mogui;..\\..\\include\\memcached;..\\..\\include;include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\\..\\Develop SDK\Lib\OpenSSL;..\\..\\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MoguiD.lib;MemcachedD.lib;MoguiToolD.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_USE_32BIT_TIME_T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\\..\\Develop SDK\Include;..\\..\\include\\mogui;..\\..\\include\\memcached;..\\..\\include;include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\\..\\libs;..\\..\\Develop SDK\Lib\OpenSSL</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Mogui.lib;Memcached.lib;MoguiTool.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Include\memcached\aglibmemcached.cpp" />
+    <ClCompile Include="GameServerSocket.cpp" />
+    <ClCompile Include="Include\dbconnect.cpp" />
+    <ClCompile Include="Include\MoGuiEncrypt.cpp" />
+    <ClCompile Include="Include\MoGuiServerSocket.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="memoperator.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="ReadWriteDB.cpp" />
+    <ClCompile Include="Server.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include\biostream.h" />
+    <ClInclude Include="..\..\Include\memcached\aglibmemcached.h" />
+    <ClInclude Include="..\..\Include\memcached\MemCacheClient.h" />
+    <ClInclude Include="..\..\Include\memcached\MemcachedLock.h" />
+    <ClInclude Include="..\..\Include\memcached\ReadWriteBuffer.h" />
+    <ClInclude Include="..\..\Include\memcached\sha1.h" />
+    <ClInclude Include="..\..\Include\moguitool.h" />
+    <ClInclude Include="..\..\Include\mogui\Common.h" />
+    <ClInclude Include="..\..\Include\mogui\Common\Condition.h" />
+    <ClInclude Include="..\..\Include\mogui\Common\ConditionVariable.h" />
+    <ClInclude Include="..\..\Include\mogui\Common\Lock.h" />
+    <ClInclude Include="..\..\Include\mogui\Common\Log.h" />
+    <ClInclude Include="..\..\Include\mogui\Common\MemoryPool.h" />
+    <ClInclude Include="..\..\Include\mogui\Common\MutexObject.h" />
+    <ClInclude Include="..\..\Include\mogui\Common\RWLock.h" />
+    <ClInclude Include="..\..\Include\mogui\Common\Semaphore.h" />
+    <ClInclude Include="..\..\Include\mogui\Common\Thread.h" />
+    <ClInclude Include="..\..\Include\mogui\SocketInterFace.h" />
+    <ClInclude Include="CConfig.h" />
+    <ClInclude Include="DBOperatorXY.h" />
+    <ClInclude Include="GameServerSocket.h" />
+    <ClInclude Include="game_data.h" />
+    <ClInclude Include="Include\dbconnect.h" />
+    <ClInclude Include="Include\MoGuiEncrypt.h" />
+    <ClInclude Include="Include\MoGuiServerSocket.h" />
+    <ClInclude Include="Include\public.h" />
+    <ClInclude Include="Include\publicdata.h" />
+    <ClInclude Include="Include\publicdef.h" />
+    <ClInclude Include="Include\PublicXY.h" />
+    <ClInclude Include="Include\PublicXYDef.h" />
+    <ClInclude Include="MemcatchXY.h" />
+    <ClInclude Include="memoperator.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="ReadWriteDB.h" />
+    <ClInclude Include="RWDBMsg.h" />
+    <ClInclude Include="Server.h" />
+    <ClInclude Include="xieyi.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
