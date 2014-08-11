@@ -71,3 +71,15 @@ Tool/Tool.vcxproj.filters
 Tool/Tool.vcxproj.user
 Tool/Debug/CL.write.1.tlog
 Tool/Debug/CL.read.1.tlog
+*.pdb
+*.obj
+*.tlog
+*.log
+*.lastbuildstate
+*.idb
+*.opensdf
+*.sdf
+libmemcached/Debug/libmemcached.lib
+libmemcached/Release/libmemcached.lib
+Mogui/Debug/Mogui.lib
+Mogui/Release/Mogui.lib
