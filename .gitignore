@@ -86,3 +86,13 @@ Mogui/Release/Mogui.lib
 Mogui/Mogui.v11.suo
 libmemcached/libmemcached.v11.suo
 Libs/Memcached.lib
+Libs/MemcachedD.lib
+Libs/Mogui.lib
+Libs/MoguiD.lib
+Libs/Tool.lib
+Libs/ToolD.lib
+Server/FlashPolicy/Debug/FlashPolicy.exe
+Server/FlashPolicy/Debug/FlashPolicy.ilk
+libmemcached/libmemcached.v12.suo
+Mogui/Mogui.v12.suo
+Tool/Tool.v12.suo
