@@ -37,7 +37,7 @@ namespace Mogui
 	// SELECT最大能够接受的fd数目
 	const unsigned int _MAX_ACCEPT_FD_SIZE		= 50000;
 	//
-	const unsigned int _MAX_CONNECT_FD_SIZE		= 20000;	
+	const unsigned int _MAX_CONNECT_FD_SIZE		= 20000;
 }
 
 /*

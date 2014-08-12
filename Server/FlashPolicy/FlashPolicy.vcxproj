@@ -90,7 +90,6 @@
     <ClCompile Include="ServerSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Define.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="ServerSocket.h" />
   </ItemGroup>

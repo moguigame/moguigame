@@ -23,8 +23,7 @@ CServerSocket::~CServerSocket(void)
 
 void CServerSocket::Close()
 {
-	if ( m_pConnect )
-	{
+	if ( m_pConnect ){
 		m_SocketState = SOCKET_ST_CLOSING;
 		m_pConnect->Close();
 	}
@@ -33,7 +32,7 @@ void CServerSocket::Close()
 void CServerSocket::OnConnect( void )
 {
 	m_SocketState = SOCKET_ST_CONNECTED;
-	m_ConnectTime =  static_cast<int>(time(NULL));
+	m_ConnectTime =  time(NULL);
 }
 
 int CServerSocket::OnMsg( const char* buf, int len )
@@ -45,10 +44,8 @@ int CServerSocket::OnMsg( const char* buf, int len )
 
 	if( len < recvflashlen+1 ) return 0;
 	else if( len > recvflashlen+1 ) return len;
-	else
-	{
-		if ( strncmp( buf, recvflash, recvflashlen)==0 && this->m_pConnect )
-		{
+	else{
+		if ( strncmp( buf, recvflash, recvflashlen)==0 && this->m_pConnect ){
 			this->m_pConnect->Send( sendflash, sendflashlen+1 );
 			return recvflashlen+1;
 		}

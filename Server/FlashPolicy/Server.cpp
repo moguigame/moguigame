@@ -18,24 +18,15 @@ CServer::CServer(void)
 	m_pPool->SetCallback( this );
 	m_pPool->Start( 843, 2000, 0);
 
-	m_CurTime = static_cast<int>(time( NULL ));
+	m_CurTime = time( NULL );
 	m_CheckActiveTime = m_CurTime;
 
 	m_bIsInitOK = true;
-
-	InitTime();
-	Random_Int(0,100);
-	printf_s("%s",GetTimeString().c_str());
-	GetCPUNumber();
-	GetMD5((void*)&m_CurTime,4);
-
-	MemoryToString((void*)&m_CurTime,4);
 }
 CServer::~CServer(void)
 {
 	MapClientSocket::iterator itorClient;
-	for(itorClient=m_Clients.begin();itorClient!=m_Clients.end();++itorClient)
-	{
+	for(itorClient=m_Clients.begin();itorClient!=m_Clients.end();++itorClient){
 		if( itorClient->first ){
 			itorClient->first->Close();
 		}
@@ -55,8 +46,7 @@ void CServer::DebugError(const char* logstr,...)
 	va_start(args,logstr);
 	int len = _vsnprintf_s(logbuf, MAX_LOG_BUF_SIZE, logstr, args);
 	va_end(args);
-	if( len>0 && len<MAX_LOG_BUF_SIZE )
-	{
+	if( len>0 && len<MAX_LOG_BUF_SIZE ){
 		Log_Text(LOGLEVEL_ERROR,logbuf);
 		printf_s("%s Error %s \n",GetTimeString(m_CurTime).c_str(),logbuf );
 	}
@@ -69,8 +59,7 @@ void CServer::DebugInfo(const char* logstr,...)
 	va_start(args, logstr);
 	int len = _vsnprintf_s(logbuf, MAX_LOG_BUF_SIZE, logstr, args);
 	va_end(args);
-	if (len>0 && len<MAX_LOG_BUF_SIZE )
-	{
+	if (len>0 && len<MAX_LOG_BUF_SIZE ){
 		Log_Text(LOGLEVEL_INFO,logbuf);
 		printf_s("%s Info  %s \n",GetTimeString(m_CurTime),logbuf );
 	}
@@ -81,16 +70,12 @@ bool CServer::OnPriorityEvent( void )
 }
 void CServer::OnTimer( void )
 {
-	m_CurTime = static_cast<int>(time( NULL ));
-
-	if( m_CurTime - m_CheckActiveTime >= 2 )
-	{
+	m_CurTime = time( NULL );
+	if( m_CurTime - m_CheckActiveTime >= 2 ){
 		m_CheckActiveTime = m_CurTime;
-		for( MapClientSocket::iterator itorClient = m_Clients.begin();itorClient != m_Clients.end();itorClient++ )
-		{
+		for( MapClientSocket::iterator itorClient = m_Clients.begin();itorClient != m_Clients.end();itorClient++ ){
 			CServerSocket* pSocket = itorClient->second;
-			if( m_CurTime - pSocket->GetConnectTime() >= 4 )
-			{
+			if( m_CurTime - pSocket->GetConnectTime() >= 4 ){
 				pSocket->Close();
 			}
 		}
@@ -98,21 +83,17 @@ void CServer::OnTimer( void )
 }
 void CServer::OnAccept( IConnect* connect )
 {
-	if( m_bIsInitOK )
-	{
-		try
-		{
+	if( m_bIsInitOK ){
+		try{
 			CServerSocket* client = new CServerSocket( this, connect );
 			m_Clients.insert( make_pair(connect, client) );
 			DebugInfo("CServer::OnAccept connect=%d ClientSize=%d",reinterpret_cast<int>(connect),m_Clients.size() );
 		}
-		catch (...)
-		{
+		catch (...)	{
 			DebugError("CServer::OnAccept Out Memory");
 		}
 	}
-	else
-	{
+	else{
 		connect->Close();
 	}
 }
@@ -126,17 +107,13 @@ void CServer::DealCloseSocket( IConnect* connect )
 	DebugInfo("CServer::DealCloseSocket start connect=%d ClientSize=%d",reinterpret_cast<int>(connect),m_Clients.size());
 
 	MapClientSocket::iterator itorConnect = m_Clients.find( connect );
-	if ( itorConnect != m_Clients.end() )
-	{
-		if( itorConnect->second )
-		{
-			delete itorConnect->second;
-			itorConnect->second = NULL;
+	if ( itorConnect != m_Clients.end() ){
+		if( itorConnect->second ){
+			safe_delete(itorConnect->second);
 		}
 		m_Clients.erase( itorConnect );
 	}
-	else
-	{
+	else{
 		DebugError("CServer::DealCloseSocket Can't Find In Client connect=%d ClientSize=%d",reinterpret_cast<int>(connect),m_Clients.size());
 	}
 

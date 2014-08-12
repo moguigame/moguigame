@@ -96,3 +96,5 @@ Server/FlashPolicy/Debug/FlashPolicy.ilk
 libmemcached/libmemcached.v12.suo
 Mogui/Mogui.v12.suo
 Tool/Tool.v12.suo
+Server/FlashPolicy/FlashPolicy.v12.suo
+Mogui/Mogui.vcxproj.filters

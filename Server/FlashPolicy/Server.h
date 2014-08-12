@@ -4,11 +4,13 @@
 #include "Common.h"
 #include "SocketInterFace.h"
 
+#include "boost/utility.hpp"
+
 using namespace std;
 using namespace Mogui;
 
 class CServerSocket;
-class CServer :	public IConnectPoolCallback
+class CServer : public IConnectPoolCallback, public boost::noncopyable
 {
 public:
 	CServer(void);
@@ -35,9 +37,5 @@ private:
 	bool                                 m_bIsInitOK;
 	time_t 		                         m_CurTime;
 	time_t                               m_CheckActiveTime;
-
-private:
-	CServer(const CServer &l);
-	CServer &operator=(const CServer &l);
 };
 

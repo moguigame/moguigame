@@ -3,11 +3,13 @@
 #include "Common.h"
 #include "SocketInterFace.h"
 
+#include "boost/utility.hpp"
+
 using namespace std;
 using namespace Mogui;
 
 class CServer;
-class CServerSocket :	public IConnectCallback
+class CServerSocket : public IConnectCallback, public boost::noncopyable
 {
 public:
 	enum { SOCKET_ST_NONE,SOCKET_ST_CONNECTING,SOCKET_ST_CONNECTED,SOCKET_ST_CLOSING };
@@ -31,9 +33,4 @@ protected:
 	IConnect*	    m_pConnect;
 	int			    m_SocketState;
 	time_t          m_ConnectTime;
-
-private:
-	CServerSocket(const CServerSocket &l);
-	CServerSocket &operator=(const CServerSocket &l);
 };
-
