@@ -85,3 +85,4 @@ Mogui/Debug/Mogui.lib
 Mogui/Release/Mogui.lib
 Mogui/Mogui.v11.suo
 libmemcached/libmemcached.v11.suo
+Libs/Memcached.lib
