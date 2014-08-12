@@ -19,14 +19,14 @@ namespace Mogui
 		MapFuncTime::iterator itorFT = m_mapFuncTime.find(strFuncName);
 		if ( itorFT != m_mapFuncTime.end() )
 		{
-			int64_t nStartTicket = itorFT->second.m_nStartTicket;
-			int64_t nEndTicket   = MoguiTool::GetMicroSecond();
-			int64_t nUseTicket   = nEndTicket - nStartTicket;
+			long long nStartTicket = itorFT->second.m_nStartTicket;
+			long long nEndTicket = MoguiTool::GetMicroSecond();
+			long long nUseTicket = nEndTicket - nStartTicket;
 
 			if ( nStartTicket>0 && nUseTicket>=0 && nEndTicket >= nStartTicket )
 			{
-				itorFT->second.m_MaxTicket = std::max<int64_t>(itorFT->second.m_MaxTicket,nUseTicket);
-				itorFT->second.m_MinTicket = std::min<int64_t>(itorFT->second.m_MinTicket,nUseTicket);
+				itorFT->second.m_MaxTicket = std::max<long long>(itorFT->second.m_MaxTicket, nUseTicket);
+				itorFT->second.m_MinTicket = std::min<long long>(itorFT->second.m_MinTicket, nUseTicket);
 
 				itorFT->second.m_nTimes++;
 				itorFT->second.m_TotalTicket += nUseTicket;

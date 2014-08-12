@@ -35,7 +35,8 @@ CServer::CServer(void)
 	m_nAcceptCount = 0;
 	m_nCloseCount = 0;
 
-	MoguiTool::InitTool();
+	::srand((unsigned int)time(NULL));
+	MoguiTool::InitTime();
 	m_DBSConf.Init();
 
 	InitLogger( "rzrq_log", LOGLEVEL_ALL );

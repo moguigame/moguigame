@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "moguitool.h"
+#include "tool.h"
 
 namespace Mogui
 {

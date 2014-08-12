@@ -98,3 +98,8 @@ Mogui/Mogui.v12.suo
 Tool/Tool.v12.suo
 Server/FlashPolicy/FlashPolicy.v12.suo
 Mogui/Mogui.vcxproj.filters
+Server/RZRQServer/RZRQServer.vcxproj.filters
+Server/RZRQServer/RZRQServer.v12.suo
+Server/RZRQServer/Release/RZRQServer.exe
+Server/FlashPolicy/Release/FlashPolicy.exe
+Server/RZRQServer/Debug/RZRQServer.exe.intermediate.manifest

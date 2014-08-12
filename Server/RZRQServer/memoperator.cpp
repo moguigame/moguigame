@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "Common.h"
-#include "moguitool.h"
+#include "tool.h"
 #include "public.h"
 
 using namespace std;

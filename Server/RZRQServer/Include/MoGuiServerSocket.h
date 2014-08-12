@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include "SocketInterFace.h"
-#include "moguitool.h"
+#include "tool.h"
 #include "MoGuiEncrypt.h"
 
 using namespace std;

@@ -25,7 +25,7 @@ void InitArray(T* pData,int nLen,T nData=0){
 }
 
 template<class T>
-std::string N2S(T Number,int Width=0)
+std::string N2S(T nNumber, int nWidth = 0)
 {
 	/*
 	std::stringstream ssIn;

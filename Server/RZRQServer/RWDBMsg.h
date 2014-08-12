@@ -3,7 +3,7 @@
 #include "Common.h"
 #include "public.h"
 
-#include "moguitool.h"
+#include "tool.h"
 #include "DBOperatorXY.h"
 
 using namespace Mogui::MoGuiXY::RWDB_XY;

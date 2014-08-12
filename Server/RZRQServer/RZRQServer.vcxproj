@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -20,12 +20,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -50,15 +52,15 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_USE_32BIT_TIME_T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\\..\\Develop SDK\Include;..\\..\\include\\mogui;..\\..\\include\\memcached;..\\..\\include;include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\\..\\..\\..\\Develop SDK\Include;..\\..\\include\\mogui;..\\..\\include\\memcached;..\\..\\include;include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\\..\\Develop SDK\Lib\OpenSSL;..\\..\\libs</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MoguiD.lib;MemcachedD.lib;MoguiToolD.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\\..\\..\\..\\Develop SDK\Lib\OpenSSL;..\\..\\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MoguiD.lib;MemcachedD.lib;ToolD.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -69,8 +71,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_USE_32BIT_TIME_T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\\..\\Develop SDK\Include;..\\..\\include\\mogui;..\\..\\include\\memcached;..\\..\\include;include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\\..\\..\\..\\Develop SDK\Include;..\\..\\include\\mogui;..\\..\\include\\memcached;..\\..\\include;include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -78,12 +80,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\\..\\libs;..\\..\\Develop SDK\Lib\OpenSSL</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Mogui.lib;Memcached.lib;MoguiTool.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\\..\\libs;..\\..\\..\\..\\Develop SDK\Lib\OpenSSL</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Mogui.lib;Memcached.lib;Tool.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Include\memcached\aglibmemcached.cpp" />
     <ClCompile Include="GameServerSocket.cpp" />
     <ClCompile Include="Include\dbconnect.cpp" />
     <ClCompile Include="Include\MoGuiEncrypt.cpp" />
@@ -96,24 +97,6 @@
     <ClCompile Include="Server.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Include\biostream.h" />
-    <ClInclude Include="..\..\Include\memcached\aglibmemcached.h" />
-    <ClInclude Include="..\..\Include\memcached\MemCacheClient.h" />
-    <ClInclude Include="..\..\Include\memcached\MemcachedLock.h" />
-    <ClInclude Include="..\..\Include\memcached\ReadWriteBuffer.h" />
-    <ClInclude Include="..\..\Include\memcached\sha1.h" />
-    <ClInclude Include="..\..\Include\moguitool.h" />
-    <ClInclude Include="..\..\Include\mogui\Common.h" />
-    <ClInclude Include="..\..\Include\mogui\Common\Condition.h" />
-    <ClInclude Include="..\..\Include\mogui\Common\ConditionVariable.h" />
-    <ClInclude Include="..\..\Include\mogui\Common\Lock.h" />
-    <ClInclude Include="..\..\Include\mogui\Common\Log.h" />
-    <ClInclude Include="..\..\Include\mogui\Common\MemoryPool.h" />
-    <ClInclude Include="..\..\Include\mogui\Common\MutexObject.h" />
-    <ClInclude Include="..\..\Include\mogui\Common\RWLock.h" />
-    <ClInclude Include="..\..\Include\mogui\Common\Semaphore.h" />
-    <ClInclude Include="..\..\Include\mogui\Common\Thread.h" />
-    <ClInclude Include="..\..\Include\mogui\SocketInterFace.h" />
     <ClInclude Include="CConfig.h" />
     <ClInclude Include="DBOperatorXY.h" />
     <ClInclude Include="GameServerSocket.h" />
