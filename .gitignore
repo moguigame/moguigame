@@ -122,3 +122,7 @@ Server/FlashPolicy/FlashPolicy.sln
 Server/FlashPolicy/FlashPolicy.sln
 Test2013/Debug/Test_Time.exe
 Test2013/Test2013.sln
+Test2013/Test_C11C14/Debug/Test_C11C14.unsuccessfulbuild
+Test2013/Debug/Test_C11C14.exe
+Test2013/Debug/Test_C11C14.ilk
+Test2013/Test_C11C14/Test_C11C14.vcxproj.filters
