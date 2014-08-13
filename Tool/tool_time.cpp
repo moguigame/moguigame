@@ -4,7 +4,7 @@
 #include <Winbase.h>
 
 #include <cstdio>
-#include <cstdint>
+#include <stdint.h>
 
 #define OTL_ODBC_MYSQL
 #define OTL_ODBC         // Compile OTL 4.0/ODBC

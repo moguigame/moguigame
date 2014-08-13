@@ -103,3 +103,22 @@ Server/RZRQServer/RZRQServer.v12.suo
 Server/RZRQServer/Release/RZRQServer.exe
 Server/FlashPolicy/Release/FlashPolicy.exe
 Server/RZRQServer/Debug/RZRQServer.exe.intermediate.manifest
+Server/FlashPolicy/Debug/FlashPolicy 2010.unsuccessfulbuild
+Server/FlashPolicy/Debug/FlashPolicy.exe.embed.manifest
+Server/FlashPolicy/Debug/FlashPolicy.exe.intermediate.manifest
+Server/FlashPolicy/Debug/FlashPolicy.exe.embed.manifest.res
+Server/FlashPolicy/ipch/flashpolicy 2010-c77c0a1a/flashpolicy 2010-259ae7ad.ipch
+Test2013/Debug/Test_Time.ilk
+Test2013/Test2013.v12.suo
+Test2013/Test2013/Test2013.vcxproj.filters
+*.manifest
+Test2013/Test_Time/Debug/Test_Time.exe.embed.manifest.res
+Test2013/Test_Time/Debug/Test_Time_manifest.rc
+Test2013/Test_Time/Test_Time.vcxproj.filters
+*.ipch
+Tool/Debug/Tool 2010.lib
+Server/FlashPolicy/Debug/FlashPolicy_manifest.rc
+Server/FlashPolicy/FlashPolicy.sln
+Server/FlashPolicy/FlashPolicy.sln
+Test2013/Debug/Test_Time.exe
+Test2013/Test2013.sln

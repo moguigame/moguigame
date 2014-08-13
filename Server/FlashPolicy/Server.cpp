@@ -61,7 +61,7 @@ void CServer::DebugInfo(const char* logstr,...)
 	va_end(args);
 	if (len>0 && len<MAX_LOG_BUF_SIZE ){
 		Log_Text(LOGLEVEL_INFO,logbuf);
-		printf_s("%s Info  %s \n",GetTimeString(m_CurTime),logbuf );
+		printf_s("%s Info  %s \n", GetTimeString(m_CurTime).c_str(), logbuf);
 	}
 }
 bool CServer::OnPriorityEvent( void )
