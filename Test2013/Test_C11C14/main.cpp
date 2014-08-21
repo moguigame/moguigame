@@ -14,6 +14,8 @@ int main(void)
 	sort(v.begin(), v.end());
 	sort(v.begin(), v.end(), [](int a, int b) { return abs(a)<abs(b); });
 
+	
+
 	cin >> nRet;
 	return nRet;
 }

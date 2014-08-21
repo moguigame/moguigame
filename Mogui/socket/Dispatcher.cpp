@@ -126,7 +126,7 @@ namespace Mogui
 			m_TotalFinishPacket++;
 
 			unsigned int nCurTick = GetTickCount();
-			int nWaitTime = nCurTick >= packet->m_StartTick ? nCurTick - packet->m_StartTick : packet->m_StartTick - nCurTick;
+			int nWaitTime = (nCurTick >= packet->m_StartTick) ? (nCurTick - packet->m_StartTick) : (packet->m_StartTick - nCurTick);
 			m_TotalWaitTime += nWaitTime;
 
 			OnPacket( packet );
