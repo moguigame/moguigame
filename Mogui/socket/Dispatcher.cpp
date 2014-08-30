@@ -90,15 +90,11 @@ namespace Mogui
 
 	int CDispatcher::Run( void )
 	{
-		static int timeStamp = 0;
-
 		while ( IsRunning( ) )
 		{
 			if( OnPriorityEvent() ) continue;
 
-			timeStamp = int(time(NULL));
-
-			CheckTimer( timeStamp );
+			CheckTimer();
 			DispatchPacket( );
 		}
 
@@ -118,16 +114,12 @@ namespace Mogui
 
 		if ( packet )
 		{
-			if ( m_TotalFinishPacket == 0 )
-			{
+			if ( m_TotalFinishPacket == 0 ){
 				m_StartTime = int(time(NULL));
 			}
-
 			m_TotalFinishPacket++;
 
-			unsigned int nCurTick = GetTickCount();
-			int nWaitTime = (nCurTick >= packet->m_StartTick) ? (nCurTick - packet->m_StartTick) : (packet->m_StartTick - nCurTick);
-			m_TotalWaitTime += nWaitTime;
+			m_TotalWaitTime += (GetTickCount64() - packet->m_StartTick);
 
 			OnPacket( packet );
 			safe_delete(packet);
@@ -143,22 +135,21 @@ namespace Mogui
 		return m_cpool->OnPriorityEvent( );
 	}
 
-	void CDispatcher::CheckTimer( int nowms )
+	void CDispatcher::CheckTimer( void )
 	{
-		if ( nowms-m_lasttime>=1 )
-		{
+		int nowms = int(time(NULL));
+		if ( nowms - m_lasttime >= 1 ){
 			m_cpool->OnTimer( );
 			m_lasttime = nowms;
 
-			if ( nowms % 30 == 0 )
-			{
-				long long InPacket = 0;
-				long long OutPacket = 0;
+			if ( nowms % 30 == 0 ){
+				long long InPacket    = 0;
+				long long OutPacket   = 0;
 				int       nPacketSize = 0;
 				{
 					CSelfLock l( m_packetlock );
-					InPacket = m_packets.GetInPakcet();
-					OutPacket = m_packets.GetOutPacket();
+					InPacket    = m_packets.GetInPakcet();
+					OutPacket   = m_packets.GetOutPacket();
 					nPacketSize = m_packets.Size();
 				}
 
@@ -172,11 +163,6 @@ namespace Mogui
 					CPacket::GetNewTimes()-CPacket::GetDeleteTimes() );
 				*/
 			}
-		}
-		else if ( nowms-m_lasttime < 0 )
-		{
-			fprintf(stderr, "Error Ê±¼ä now=%d last=%d \n", nowms, m_lasttime );
-			m_lasttime = nowms;			
 		}
 	}
 

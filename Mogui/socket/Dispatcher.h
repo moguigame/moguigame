@@ -32,7 +32,7 @@ namespace Mogui
 
 		void DispatchPacket( void );
 		bool OnPriorityEvent( void );
-		void CheckTimer( int nowms );
+		void CheckTimer( void );
 		void OnPacket( CPacket* packet );
 
 	private:

@@ -32,7 +32,7 @@ namespace Mogui
 		int				    m_type;
 		IConnectCallback*   m_callback;
 		char			    m_buffer[_MAX_BUFFER_LENGTH];
-		unsigned int        m_StartTick;
+		long long           m_StartTick;
 	};
 
 	class CPacketQueue
@@ -62,7 +62,7 @@ namespace Mogui
 			if ( packet )
 			{
 				packet->m_next = 0;
-				packet->m_StartTick = GetTickCount();
+				packet->m_StartTick = GetTickCount64();
 
 				if ( m_tail )
 				{
