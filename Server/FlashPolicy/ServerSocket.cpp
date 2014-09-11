@@ -3,6 +3,9 @@
 #include "ServerSocket.h"
 #include "Server.h"
 
+using namespace std;
+using namespace Mogui;
+
 CServerSocket::CServerSocket( CServer* server, IConnect* pConnect )
 {
 	m_pServer  = server;

@@ -7,5 +7,3 @@
 #include "tool\tool_string.h"
 #include "tool\tool_utils.h"
 #include "tool\tool_sys.h"
-
-using namespace MoguiTool;

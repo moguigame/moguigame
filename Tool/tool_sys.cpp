@@ -17,7 +17,7 @@ extern "C"
 #pragma comment(lib, "Iphlpapi.lib")
 #pragma comment(lib, "kernel32.lib")
 
-namespace MoguiTool
+namespace Tool
 {
 	bool GetGUID(std::string& strGUID)
 	{

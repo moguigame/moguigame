@@ -6,32 +6,29 @@
 
 #include "boost/utility.hpp"
 
-using namespace std;
-using namespace Mogui;
-
 class CServerSocket;
-class CServer : public IConnectPoolCallback, public boost::noncopyable
+class CServer : public Mogui::IConnectPoolCallback, public boost::noncopyable
 {
 public:
 	CServer(void);
 	virtual ~CServer(void);
 
-	typedef map<IConnect*, CServerSocket*>  						MapClientSocket;
+	typedef std::map<Mogui::IConnect*, CServerSocket*>  	MapClientSocket;
 
 private:
 	bool OnPriorityEvent( void );
 	void OnTimer( void );
-	void OnAccept( IConnect* connect );
-	void OnClose( IConnect* nocallbackconnect, bool bactive );
+	void OnAccept(Mogui::IConnect* connect);
+	void OnClose(Mogui::IConnect* nocallbackconnect, bool bactive);
 
 public:
-	void DealCloseSocket( IConnect* connect );
+	void DealCloseSocket(Mogui::IConnect* connect);
 
 	inline void        DebugError(const char* logstr,...);
 	inline void        DebugInfo(const char* logstr,...);
 
 private:
-	IConnectPool*			             m_pPool;
+	Mogui::IConnectPool*			     m_pPool;
 	MapClientSocket          	         m_Clients;
 
 	bool                                 m_bIsInitOK;

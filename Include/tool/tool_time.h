@@ -3,10 +3,8 @@
 #include <ctime>
 #include <string>
 
-using std::string;
-
 class otl_datetime;
-namespace MoguiTool
+namespace Tool
 {
 	extern void         InitTime(bool sShowInfo=true);
 

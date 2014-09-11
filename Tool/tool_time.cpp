@@ -13,7 +13,9 @@
 #define OTL_BIGINT long long
 #include <otlv4.h>       // include the OTL 4.0 header file
 
-namespace MoguiTool
+using std::string;
+
+namespace Tool
 {
 	//CPU的每秒的可度量次数，不是指频率，而且是频率的倍数值
 	static long long                        s_CPUFrequency = 1;

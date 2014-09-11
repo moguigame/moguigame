@@ -4,19 +4,15 @@
 #include <string>
 #include <map>
 
-using std::string;
-using std::vector;
-using std::map;
-
-namespace MoguiTool
+namespace Tool
 {
 	//×Ö·û´®µÄ´¦Àí
-	extern vector<string>        SplitString(const string& src,const string& trim );
-	extern map<string,long long> GetRuleMapInData(const string& src,const string& strFirst,const string& strSecond);
-	extern map<string,string>    GetRuleMapInString(const string& src,const string& strFirst,const string& strSecond);
-	extern bool                  GetKeyValue(const string& strSource,const string& strKey,long long& nValue);
-	extern string                GetKeyString(const string& strSource,const string& strKey);
+	extern std::vector<std::string>              SplitString(const std::string& src, const std::string& trim);
+	extern std::map<std::string, long long>      GetRuleMapInData(const std::string& src, const std::string& strFirst, const std::string& strSecond);
+	extern std::map<std::string, std::string>    GetRuleMapInString(const std::string& src, const std::string& strFirst, const std::string& strSecond);
+	extern bool                                  GetKeyValue(const std::string& strSource, const std::string& strKey, long long& nValue);
+	extern std::string                           GetKeyString(const std::string& strSource, const std::string& strKey);
 
-	extern string       MemoryToString(const void *memory, int size);
-	extern void         StringToMemory(std::string& strSrc,const void *memory);
+	extern std::string       MemoryToString(const void *memory, int size);
+	extern void              StringToMemory(std::string& strSrc,const void *memory);
 }

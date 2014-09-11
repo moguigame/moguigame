@@ -4,9 +4,6 @@
 #include <vector>
 #include <sstream>
 
-using std::vector;
-using std::string;
-
 template<class T> void safe_delete(T* pData)
 {
 	if ( pData ){ delete pData;	pData = nullptr;}
@@ -75,7 +72,7 @@ std::string N2S(T Number,int Width=0)
 		*p = 0;
 	}
 
-	return string(retBuf);
+	return std::string(retBuf);
 }
 
 template<class T>
@@ -131,7 +128,7 @@ std::string ZN2S(T nNumber,int nWidth=0)
 		*p = 0;
 	}
 
-	return string(retBuf);
+	return std::string(retBuf);
 };
 
 template<typename T>
@@ -148,7 +145,7 @@ inline std::string ArrayToString(const T* pData,int nLen,int nWidth,const std::s
 template<typename T>
 inline std::string ArrayToString(const std::vector<T>& srcArray,int nWidth,const std::string& strTrim="")
 {
-	string retString("");
+	std::string retString("");
 	for ( size_t nCount=0;nCount<srcArray.size();nCount++ )
 	{
 		retString += (N2S(srcArray[nCount],nWidth)+strTrim);
@@ -157,9 +154,9 @@ inline std::string ArrayToString(const std::vector<T>& srcArray,int nWidth,const
 }
 
 template<typename T>
-inline string VectorArrayToString(const vector<vector<T> >& srcArray)
+inline std::string VectorArrayToString(const std::vector<std::vector<T> >& srcArray)
 {
-	string retString("");
+	std::string retString("");
 	for ( size_t nCount=0;nCount<srcArray.size();nCount++ )
 	{
 		retString += ArrayToString(srcArray[nCount]) + "\n";
@@ -168,17 +165,17 @@ inline string VectorArrayToString(const vector<vector<T> >& srcArray)
 }
 
 template<typename T>
-void GetZuHe( const vector<T>& srcArray,int nSelect,vector<vector<T> >& retVectorArray )
+void GetZuHe(const std::vector<T>& srcArray, int nSelect, std::vector<std::vector<T> >& retVectorArray)
 {
 	int nTotal = srcArray.size();	
 	if ( nTotal && nTotal>=nSelect )
 	{
-		vector<T> p;
+		std::vector<T> p;
 		p.insert(p.end(), nSelect, 1);
 		p.insert(p.end(), nTotal - nSelect, 0);
 
-		vector<T> TempArray;
-		vector<T> sortArray = srcArray;
+		std::vector<T> TempArray;
+		std::vector<T> sortArray = srcArray;
 		sort(sortArray.begin(),sortArray.end());
 		do
 		{
@@ -196,9 +193,9 @@ void GetZuHe( const vector<T>& srcArray,int nSelect,vector<vector<T> >& retVecto
 }
 
 template<typename T>
-void GetPaiLie( const vector<T>& srcArray,vector<vector<T> >& retVectorArray )
+void GetPaiLie(const std::vector<T>& srcArray, std::vector<std::vector<T> >& retVectorArray)
 {
-	typedef vector<T> Array;
+	typedef std::vector<T> Array;
 
 	if ( srcArray.size() )
 	{

@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace MoguiTool
+namespace Tool
 {
 	extern bool         GetGUID(std::string& strOutGUID);
 	extern bool         GetGUID(unsigned char* pOutGUID);

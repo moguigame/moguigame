@@ -6,7 +6,11 @@
 #include "boost\algorithm\string.hpp"
 #include "boost\utility.hpp"
 
-namespace MoguiTool
+using std::string;
+using std::vector;
+using std::map;
+
+namespace Tool
 {
 	vector<string> SplitString(const string& src,const string& trim )
 	{

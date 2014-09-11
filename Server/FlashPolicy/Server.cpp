@@ -5,6 +5,10 @@
 #include "Server.h"
 #include "ServerSocket.h"
 
+using namespace std;
+using namespace Mogui;
+using namespace Tool;
+
 #pragma comment(lib, "libeay32.lib")
 #pragma comment(lib, "ssleay32.lib")
 

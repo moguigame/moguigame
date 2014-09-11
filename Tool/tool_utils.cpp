@@ -6,7 +6,7 @@
 #pragma comment(lib,"Shlwapi.lib")
 #pragma comment(lib,"libeay32.lib")
 
-namespace MoguiTool
+namespace Tool
 {
 	int  Random_Int(int nMin, int nMax)
 	{
