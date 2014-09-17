@@ -13,7 +13,7 @@
 #include <boost/shared_ptr.hpp>
 #include "boost/utility.hpp"
 
-#include "MoguiTool.h"
+#include "Tool.h"
 
 #include "PublicXYDef.h"
 #include "PublicXY.h"

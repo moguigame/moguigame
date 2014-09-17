@@ -22,18 +22,8 @@ void InitArray(T* pData,int nLen,T nData=0){
 }
 
 template<class T>
-std::string N2S(T Number,int Width=0)
+std::string N2S(T nNumber,int nWidth=0)
 {
-	/*
-	std::stringstream ssIn;
-
-	if ( Width ) ssIn.width(Width);	
-	if ( Number<=255 && Number>=-128 ) ssIn<<int(Number);	
-	else ssIn<<Number;
-
-	return ssIn.str();
-	*/
-
 	static char retBuf[32];
 	static char digits[19] =  
 	{ '9', '8', '7', '6', '5', '4', '3', '2', '1', 

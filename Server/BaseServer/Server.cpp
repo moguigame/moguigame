@@ -30,7 +30,7 @@ CServer::CServer(void)
 	m_nAcceptCount = 0;
 	m_nCloseCount = 0;
 
-	MoguiTool::InitTool();
+	Tool::InitTime();
 	m_DBSConf.Init();
 
 	InitLogger( "rzrq_log", LOGLEVEL_ALL );
@@ -104,7 +104,7 @@ void CServer::DebugError(const char* logstr,...)
 	if( len>0 && len<=MAX_LOG_BUF_SIZE )
 	{
 		Log_Text(LOGLEVEL_ERROR,logbuf);
-		printf_s("%s Error:GameServer %s \n",MoguiTool::GetTimeString(m_CurTime).c_str(),logbuf );
+		printf_s("%s Error:GameServer %s \n", Tool::GetTimeString(m_CurTime).c_str(), logbuf);
 	}
 }
 void CServer::DebugLog(const char* logstr,...)
@@ -158,8 +158,7 @@ void CServer::GSEnterFunc(const string& strFuncName)
 				m_mapFuncTime.insert(make_pair(strFuncName,stFuncTimeLog(strFuncName)));
 				itorFT = m_mapFuncTime.find(strFuncName);
 			}
-			itorFT->second.m_nStartTicket = MoguiTool::GetMicroSecond();
-			itorFT->second.m_nEnterTimes++;
+			itorFT->second.m_nStartTicket = Tool::GetMicroSecond();	
 		}
 	}
 }
@@ -174,7 +173,7 @@ void CServer::GSEndFunc(const string& strFuncName)
 			if ( itorFT != m_mapFuncTime.end() )
 			{
 				int64_t nStartTicket = itorFT->second.m_nStartTicket;
-				int64_t nEndTicket   = MoguiTool::GetMicroSecond();
+				int64_t nEndTicket = Tool::GetMicroSecond();
 				int64_t nUseTicket   = nEndTicket - nStartTicket;
 				assert(nStartTicket>0);
 
@@ -188,7 +187,7 @@ void CServer::GSEndFunc(const string& strFuncName)
 					{
 						itorFT->second.m_MinTicket = nUseTicket;
 					}
-					itorFT->second.m_nEndTimes++;
+					
 					itorFT->second.m_nTimes++;
 					itorFT->second.m_TotalTicket += nUseTicket;
 				}
@@ -230,9 +229,9 @@ void CServer::OnTimer( void )
 	m_CurTime = time( NULL );
 
 	s_nOnTimeCount++;
-	s_nStartTime = MoguiTool::GetMilliSecond();
+	s_nStartTime = Tool::GetMilliSecond();
 
-	s_nTimeEnd = MoguiTool::GetMilliSecond();
+	s_nTimeEnd = Tool::GetMilliSecond();
 	s_nUseTime = int(s_nTimeEnd - s_nStartTime);
 	s_nTotalUseTime += s_nUseTime;
 
@@ -244,7 +243,7 @@ void CServer::OnTimer( void )
 	if ( m_CurTime % 60 == 0 )
 	{
 		DebugLogOut("%s MaxTime=%d CurUseTime=%d AverUseTime=%d",
-			MoguiTool::GetTimeString(m_CurTime).c_str(),s_nMaxUseTime,s_nUseTime,int(s_nTotalUseTime/s_nOnTimeCount) );
+			Tool::GetTimeString(m_CurTime).c_str(), s_nMaxUseTime, s_nUseTime, int(s_nTotalUseTime / s_nOnTimeCount));
 	}
 
 	GSEndFunc("OnTimer");

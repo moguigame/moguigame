@@ -3,11 +3,10 @@
 #include "Common.h"
 #include "public.h"
 
-#include "moguitool.h"
+#include "tool.h"
 #include "DBOperatorXY.h"
 
 using namespace MoGui::MoGuiXY::RWDB_XY;
-using namespace MoguiTool;
 
 class RWDBMsgManage : public boost::noncopyable
 {
@@ -35,7 +34,7 @@ public:
 		if (len>0 && len<=MAX_LOG_BUF_SIZE )
 		{
 			Log_Text(LOGLEVEL_INFO,logbuf);
-			fprintf_s(stderr,"%s %s\n",MoguiTool::GetTimeString(m_CheckTime).c_str(),logbuf);
+			fprintf_s(stderr, "%s %s\n", Tool::GetTimeString(m_CheckTime).c_str(), logbuf);
 		}
 	}
 
@@ -47,7 +46,7 @@ public:
 		if ( pMsg )
 		{
 			MakeRWDBMsg(xieyi,*pMsg);
-			pMsg->m_nTimeCount = MoguiTool::GetMilliSecond();
+			pMsg->m_nTimeCount = Tool::GetMilliSecond();
 			{
 				CSelfLock lock(m_lockMsg);
 				m_queueMsg.push(pMsg);
@@ -78,7 +77,7 @@ public:
 			//cout<<"Pop  "<<nMsgSize<<" "<<nMemSize<<" "<<m_nFinishCount<<endl;
 
 			m_nFinishCount++;
-			int64_t nTicketTime = (MoguiTool::GetMilliSecond() - pMsg->m_nTimeCount);
+			int64_t nTicketTime = (Tool::GetMilliSecond() - pMsg->m_nTimeCount);
 			if ( nTicketTime > m_MaxTicketCount )
 			{
 				m_MaxTicketCount = nTicketTime;

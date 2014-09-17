@@ -4,6 +4,7 @@
 #include "player.h"
 
 using namespace MoGui;
+using namespace Tool;
 
 GameServerSocket::GameServerSocket( CServer* server, IConnect* connect ):CMoGuiServerSocket(connect)
 {
@@ -265,8 +266,8 @@ int GameServerSocket::OnReqKey(CRecvMsgPacket& msgPack)
 
 		PublicXY::RespKey respMsgKey;
 		respMsgKey.m_Len = respMsgKey.KEYLEN32;
-		MoguiTool::GetGUID(respMsgKey.m_Key);
-		MoguiTool::GetGUID(respMsgKey.m_Key+16);
+		GetGUID(respMsgKey.m_Key);
+		GetGUID(respMsgKey.m_Key+16);
 		SendMsg(respMsgKey);
 
 		SetKey(respMsgKey.m_Key,respMsgKey.KEYLEN32);

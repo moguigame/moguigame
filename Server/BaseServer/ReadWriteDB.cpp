@@ -26,7 +26,7 @@ DBOperator::DBOperator(CServer* pServer)
 		m_ID = ++s_MaxID;
 
 		m_CurTime = time( NULL );
-		m_LastCheckTime = m_CurTime - MoguiTool::Random_Int(1,180);
+		m_LastCheckTime = m_CurTime - Tool::Random_Int(1,180);
 	}
 	else
 	{
@@ -49,7 +49,7 @@ void DBOperator::DebugError(const char* logstr,...)
 	if( len>0 && len<=MAX_LOG_BUF_SIZE )
 	{
 		Log_Text(LOGLEVEL_ERROR,logbuf);
-		cout<<MoguiTool::GetTimeString()+" Error "<<logbuf<<endl;
+		cout << Tool::GetTimeString() + " Error " << logbuf << endl;
 	}
 }
 void DBOperator::DebugInfo(const char* logstr,...)
@@ -77,8 +77,7 @@ void DBOperator::EnterFunc(const string& strFuncName)
 				m_mapFuncTime.insert(make_pair(strFuncName,stFuncTimeLog(strFuncName)));
 				itorFT = m_mapFuncTime.find(strFuncName);
 			}
-			itorFT->second.m_nStartTicket = MoguiTool::GetMicroSecond();
-			itorFT->second.m_nEnterTimes++;
+			itorFT->second.m_nStartTicket = Tool::GetMicroSecond();
 		}
 	}
 }
@@ -92,7 +91,7 @@ void DBOperator::EndFunc(const string& strFuncName)
 			if ( itorFT != m_mapFuncTime.end() )
 			{
 				INT64 nStartTicket = itorFT->second.m_nStartTicket;
-				INT64 nEndTicket   = MoguiTool::GetMicroSecond();
+				INT64 nEndTicket = Tool::GetMicroSecond();
 				INT64 nUseTicket   = nEndTicket - nStartTicket;
 
 				if ( nUseTicket>=0 && nEndTicket >= nStartTicket )
@@ -105,8 +104,7 @@ void DBOperator::EndFunc(const string& strFuncName)
 					{
 						itorFT->second.m_MinTicket = nUseTicket;
 					}
-
-					itorFT->second.m_nEndTimes++;
+					
 					itorFT->second.m_nTimes++;
 					itorFT->second.m_TotalTicket += nUseTicket;
 				}
@@ -157,12 +155,11 @@ int DBOperator::OnActiveDBConnect()
 			for ( size_t nPos=0;nPos<vectorFT.size();++nPos)
 			{
 				const stFuncTimeLog& rFT = vectorFT[nPos];
-				DebugInfo("ID=%-2d %-30s TotalTicket=%-10lld Times=%-8lld Diff=%-5lld Average=%-8lld Max=%-8lld Min=%-5lld",
+				DebugInfo("ID=%-2d %-30s TotalTicket=%-10lld Times=%-8lld Average=%-8lld Max=%-8lld Min=%-5lld",
 					m_ID,
 					rFT.m_strFuncName.c_str(),
 					rFT.m_TotalTicket/1000,
-					rFT.m_nTimes,
-					rFT.m_nEnterTimes-rFT.m_nEndTimes,
+					rFT.m_nTimes,					
 					rFT.m_TotalTicket/max(rFT.m_nTimes,1),
 					rFT.m_MaxTicket,
 					rFT.m_MinTicket );

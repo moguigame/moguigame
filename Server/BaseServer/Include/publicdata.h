@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "moguitool.h"
+#include "tool.h"
 
 namespace MoGui
 {
@@ -20,7 +20,7 @@ namespace MoGui
 		long long                             m_MaxTicket;
 		long long                             m_MinTicket;
 
-		long long                             m_nStartTicket;	
+		long long                             m_nStartTicket;
 
 		stFuncTimeLog(const string& strName="") 
 			: m_strFuncName(strName),m_TotalTicket(0),m_nTimes(0),m_MaxTicket(0),m_MinTicket(0),m_nStartTicket(0)

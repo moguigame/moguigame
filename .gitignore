@@ -126,3 +126,8 @@ Test2013/Test_C11C14/Debug/Test_C11C14.unsuccessfulbuild
 Test2013/Debug/Test_C11C14.exe
 Test2013/Debug/Test_C11C14.ilk
 Test2013/Test_C11C14/Test_C11C14.vcxproj.filters
+Server/BaseServer/RZRQServer.v12.suo
+Server/BaseServer/Debug/RZRQServer.exe.embed.manifest.res
+Server/BaseServer/Debug/RZRQServer.unsuccessfulbuild
+Server/BaseServer/Debug/RZRQServer_manifest.rc
+Server/BaseServer/RZRQServer.sln
