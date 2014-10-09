@@ -51,7 +51,7 @@ void GameServerSocket::DebugError(const char* logstr,...)
 	if (len>0 && len<=MAX_LOG_BUF_SIZE )
 	{
 		Log_Text(LOGLEVEL_ERROR,logbuf);
-		printf_s("%s Error GameServerSocket %s \n",MoguiTool::GetTimeString().c_str(),logbuf);
+		printf_s("%s Error GameServerSocket %s \n", Tool::GetTimeString().c_str(), logbuf);
 	}
 }
 
@@ -300,8 +300,8 @@ int GameServerSocket::OnReqKey(CRecvMsgPacket& msgPack)
 
 		PublicXY::RespKey respMsgKey;
 		respMsgKey.m_Len = respMsgKey.KEYLEN32;
-		MoguiTool::GetGUID(respMsgKey.m_Key);
-		MoguiTool::GetGUID(respMsgKey.m_Key+16);
+		Tool::GetGUID(respMsgKey.m_Key);
+		Tool::GetGUID(respMsgKey.m_Key + 16);
 		SendMsg(respMsgKey);
 
 		SetKey(respMsgKey.m_Key,respMsgKey.KEYLEN32);

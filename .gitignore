@@ -131,3 +131,5 @@ Server/BaseServer/Debug/RZRQServer.exe.embed.manifest.res
 Server/BaseServer/Debug/RZRQServer.unsuccessfulbuild
 Server/BaseServer/Debug/RZRQServer_manifest.rc
 Server/BaseServer/RZRQServer.sln
+Server/RZRQServer/Debug/RZRQServer.exe
+Server/RZRQServer/Debug/RZRQServer.ilk

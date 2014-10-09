@@ -9,7 +9,7 @@
 
 using namespace std;
 using namespace Mogui;
-using namespace MoguiTool;
+using namespace Tool;
 
 typedef map<uint16_t,int64_t>                  MapXieYiIO;
 

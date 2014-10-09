@@ -36,7 +36,7 @@ CServer::CServer(void)
 	m_nCloseCount = 0;
 
 	::srand((unsigned int)time(NULL));
-	MoguiTool::InitTime();
+	Tool::InitTime();
 	m_DBSConf.Init();
 
 	InitLogger( "rzrq_log", LOGLEVEL_ALL );
@@ -112,7 +112,7 @@ void CServer::DebugError(const char* logstr,...)
 	if( len>0 && len<=MAX_LOG_BUF_SIZE )
 	{
 		Log_Text(LOGLEVEL_ERROR,logbuf);
-		printf_s("%s Error:GameServer %s \n",MoguiTool::GetTimeString(m_CurTime).c_str(),logbuf );
+		printf_s("%s Error:GameServer %s \n", Tool::GetTimeString(m_CurTime).c_str(), logbuf);
 	}
 }
 void CServer::DebugLogOut(const char* logstr,...)
@@ -125,7 +125,7 @@ void CServer::DebugLogOut(const char* logstr,...)
 	if( len>0 && len<=MAX_LOG_BUF_SIZE )
 	{
 		Log_Text(LOGLEVEL_INFO,logbuf);
-		printf_s("%s %s \n",MoguiTool::GetTimeString(m_CurTime).c_str(),logbuf);
+		printf_s("%s %s \n", Tool::GetTimeString(m_CurTime).c_str(), logbuf);
 	}
 }
 void CServer::DebugInfo(const char* logstr,...)
@@ -176,11 +176,11 @@ void CServer::OnTimer( void )
 		m_CurTime = time( NULL );
 
 		s_nOnTimeCount++;
-		s_nStartTime = MoguiTool::GetMilliSecond();
+		s_nStartTime = Tool::GetMilliSecond();
 
 		CheckRzrqInfo();
 
-		s_nTimeEnd = MoguiTool::GetMilliSecond();
+		s_nTimeEnd = Tool::GetMilliSecond();
 		s_nUseTime = int(s_nTimeEnd - s_nStartTime);
 		s_nTotalUseTime += s_nUseTime;
 
@@ -192,7 +192,7 @@ void CServer::OnTimer( void )
 		if ( m_CurTime % 60 == 0 )
 		{
 			//DebugLogOut("%s MaxTime=%d CurUseTime=%d AverUseTime=%d",
-			//	MoguiTool::GetTimeString(m_CurTime).c_str(),s_nMaxUseTime,s_nUseTime,int(s_nTotalUseTime/s_nOnTimeCount) );
+			//	Tool::GetTimeString(m_CurTime).c_str(),s_nMaxUseTime,s_nUseTime,int(s_nTotalUseTime/s_nOnTimeCount) );
 		}
 	}
 	catch (...)

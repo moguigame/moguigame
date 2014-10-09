@@ -21,7 +21,7 @@ void DBConnect::print_otl_error(const otl_exception &p)
 	_snprintf(msg+strlen(msg), sizeof(msg)-strlen(msg)-1, "stm_text=%s\n", p.stm_text);	// print out SQL that caused the error
 	_snprintf(msg+strlen(msg), sizeof(msg)-strlen(msg)-1, "sqlstate=%s\n", p.sqlstate);	// print out SQLSTATE message
 	_snprintf(msg+strlen(msg), sizeof(msg)-strlen(msg)-1, "var_info=%s\n", p.var_info);	// print out the variable that caused the error	
-	fprintf_s(stderr,"DBConnect %s %s \n",GetTimeString().c_str(),msg);
+	fprintf_s(stderr, "DBConnect %s %s \n", Tool::GetTimeString().c_str(), msg);
 }
 
 void DBConnect::Init(std::string strDB)

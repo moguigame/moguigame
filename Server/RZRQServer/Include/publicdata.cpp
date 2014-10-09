@@ -12,7 +12,7 @@ namespace Mogui
 			m_mapFuncTime.insert(make_pair(strFuncName,stFuncTimeLog(strFuncName)));
 			itorFT = m_mapFuncTime.find(strFuncName);
 		}
-		itorFT->second.m_nStartTicket = MoguiTool::GetMicroSecond();
+		itorFT->second.m_nStartTicket = Tool::GetMicroSecond();
 	}
 	void CMapFunctionTime::ExitFunc(const string& strFuncName)
 	{
@@ -20,7 +20,7 @@ namespace Mogui
 		if ( itorFT != m_mapFuncTime.end() )
 		{
 			long long nStartTicket = itorFT->second.m_nStartTicket;
-			long long nEndTicket = MoguiTool::GetMicroSecond();
+			long long nEndTicket = Tool::GetMicroSecond();
 			long long nUseTicket = nEndTicket - nStartTicket;
 
 			if ( nStartTicket>0 && nUseTicket>=0 && nEndTicket >= nStartTicket )

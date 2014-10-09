@@ -21,7 +21,7 @@ DBOperator::DBOperator(CServer* pServer)
 		m_ID = ++s_MaxID;
 
 		m_CurTime = time( NULL );
-		m_LastCheckTime = m_CurTime - MoguiTool::Random_Int(1,180);
+		m_LastCheckTime = m_CurTime - Tool::Random_Int(1, 180);
 	}
 	else
 	{
@@ -44,7 +44,7 @@ void DBOperator::DebugError(const char* logstr,...)
 	if( len>0 && len<=MAX_LOG_BUF_SIZE )
 	{
 		Log_Text(LOGLEVEL_ERROR,logbuf);
-		cout<<MoguiTool::GetTimeString()+" Error "<<logbuf<<endl;
+		cout << Tool::GetTimeString() + " Error " << logbuf << endl;
 	}
 }
 void DBOperator::DebugInfo(const char* logstr,...)

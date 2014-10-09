@@ -46,7 +46,7 @@ void MemOperator::DebugError(const char* logstr,...)
 	if( len>0 && len<=MAX_LOG_BUF_SIZE )
 	{
 		Log_Text(LOGLEVEL_ERROR,logbuf);
-		fprintf_s(stderr,"%s %s\n",MoguiTool::GetTimeString(time(nullptr)).c_str(),logbuf);
+		fprintf_s(stderr,"%s %s\n",Tool::GetTimeString(time(nullptr)).c_str(),logbuf);
 	}
 }
 
