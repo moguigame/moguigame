@@ -1,8 +1,8 @@
 #pragma once
 
-//在lib中已定义 _USE_32BIT_TIME_T
 #include <Windows.h>
 
+#include "Common\MoguiData.h"
 #include "Common\Condition.h"
 #include "Common\ConditionVariable.h"
 #include "Common\Lock.h"

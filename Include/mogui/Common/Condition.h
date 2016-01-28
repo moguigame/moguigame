@@ -2,12 +2,10 @@
 
 #include "boost/utility.hpp"
 
-namespace Mogui
-{
-	class CLock;
+namespace Mogui{
 
-	class CCondition : public boost::noncopyable
-	{
+	class CLock;
+	class CCondition : public boost::noncopyable{
 	public:
 		explicit CCondition(void);
 		~CCondition(void);
@@ -21,4 +19,5 @@ namespace Mogui
 	private:
 		HANDLE  m_condid;
 	};
+
 }

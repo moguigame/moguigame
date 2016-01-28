@@ -2,17 +2,13 @@
 
 #include "boost/utility.hpp"
 
-namespace Mogui
-{
-	//WinBase.h on Windows Vista, Windows 7, Windows Server 2008, and Windows Server 2008 R2 (include Windows.h);
-	//Synchapi.h on Windows 8 and Windows Server 2012
+namespace Mogui{
 
 	class CLock;
 	class CRWLock;
 
 	//线程以原子的方式把锁释放掉并将自己阻塞，直到某一条件成立为止,重新获得锁
-	class CConditionVariable : public boost::noncopyable
-	{
+	class CConditionVariable : public boost::noncopyable{
 	public:
 		CConditionVariable(void);
 		~CConditionVariable(void);
@@ -30,4 +26,5 @@ namespace Mogui
 	private:
 		CONDITION_VARIABLE  m_ConditionVariables;
 	};
+
 }

@@ -1,36 +1,28 @@
 #include "Lock.h"
 
-namespace Mogui
-{
-	//----------CLock---------------------------
-	CLock::CLock(void)
-	{
+namespace Mogui{
+
+	CLock::CLock(void){
 		::InitializeCriticalSection(&m_lock);
 	}
-	CLock::~CLock(void)
-	{
+	CLock::~CLock(void){
 		::DeleteCriticalSection(&m_lock);
 	}	
-	void CLock::Lock()
-	{
+	void CLock::Lock(){
 		::EnterCriticalSection(&m_lock);
 	}
-	void CLock::Unlock()
-	{
+	void CLock::Unlock(){
 		::LeaveCriticalSection(&m_lock);
 	}
-	CRITICAL_SECTION* CLock::GetCS()
-	{
+	CRITICAL_SECTION* CLock::GetCS(){
 		return &m_lock;
 	}
 
-	//----------CSelfLock---------------------------
-	CSelfLock::CSelfLock(CLock& lock):m_lock(lock)
-	{
+	CSelfLock::CSelfLock(CLock& lock):m_lock(lock){
 		m_lock.Lock();
 	}
-	CSelfLock::~CSelfLock()
-	{
+	CSelfLock::~CSelfLock(){
 		m_lock.Unlock();
 	}
+
 }

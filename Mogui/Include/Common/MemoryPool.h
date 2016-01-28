@@ -1,12 +1,14 @@
 #pragma once
 
 #include <cassert>
-#include "boost/utility.hpp"
 #include <stack>
 #include <deque>
 #include <queue>
 
+#include "boost/utility.hpp"
+
 #include "Lock.h"
+#include "MoguiData.h"
 
 /**********************测试结果********************************************************/
 /*
@@ -15,159 +17,47 @@ LockFree 随线程数量变量较大，CLock较稳定，在线程数量较少的情况下 LockFree 的速度
 */
 /**************************************************************************************/
 
-namespace Mogui
-{
-	template<typename T>
-	class CLock_Stack : public boost::noncopyable
-	{
-	public:
-		CLock_Stack(){}
-		~CLock_Stack(){}
-		size_t GetSize() { return m_pData.size(); }
-
-		void Push(T* pData)
-		{
-			if ( pData!=nullptr )
-			{
-				CSelfLock sl(m_Lock);
-				m_pData.push(pData);
-			}		
-		}
-		T* Pop()
-		{
-			T* pData = nullptr;
-			CSelfLock sl(m_Lock);
-			if ( m_pData.size() )
-			{
-				pData = m_pData.top();
-				m_pData.pop();
-			}
-			return pData;
-		}
-
-	private:
-		CLock              m_Lock;
-		std::stack<T*>     m_pData;
-	};
-
-	template<typename T>
-	class CLock_Queue : public boost::noncopyable
-	{
-	public:
-		CLock_Queue(){}
-		~CLock_Queue(){}
-		size_t GetSize() { return m_pData.size(); }
-
-		void Push(T* pData)
-		{
-			if ( pData != nullptr )
-			{
-				CSelfLock sl(m_Lock);
-				m_pData.push(pData);
-			}
-		}
-		T* Pop(void)
-		{
-			T* pData = nullptr;
-			CSelfLock sl(m_Lock);
-			if ( m_pData.size() )
-			{
-				pData = m_pData.front();
-				m_pData.pop();
-			}
-			return pData;
-		}
-
-	private:
-		CLock               m_Lock;
-		std::queue<T*>      m_pData;
-	};
-
-	template<typename T>
-	class CLock_Deque : public boost::noncopyable
-	{
-	public:
-		CLock_Deque(){}
-		~CLock_Deque(){}
-		size_t GetSize() { return m_pData.size(); }
-
-		void Push(T* pData)
-		{
-			if ( pData != nullptr )
-			{
-				CSelfLock sl(m_Lock);
-				m_pData.push_back(pData);
-			}
-		}
-		T* Pop(void)
-		{
-			T* pData = nullptr;
-			CSelfLock sl(m_Lock);
-			if ( m_pData.size() )
-			{
-				pData = m_pData.front();
-				m_pData.pop_front();
-			}
-			return pData;
-		}
-
-	private:
-		CLock               m_Lock;
-		std::deque<T*>      m_pData;
-	};
-
+namespace Mogui{
 
 	template<class T, size_t ALLOC_BLOCK_SIZE=10>
-	class CLockMemoryPool_Private : public boost::noncopyable
-	{
+	class CLockMemoryPool_Private : public boost::noncopyable{
 	public:
 		CLockMemoryPool_Private(void){}
 		~CLockMemoryPool_Private(){ ClearPool(); }
 
-		void* AllocFromPool()
-		{
+		void* AllocFromPool(){
 			void* pTemp = nullptr;
-			while( !(pTemp=m_Pool.Pop()) )
-			{
+			while( !(pTemp=m_Pool.Pop()) ){
 				AllocBlock();
 			}
 			return pTemp;
 		}
-		void FreeToPool(void* pObject)
-		{
+		void FreeToPool(void* pObject){
 			assert(pObject);
-			if ( pObject )
-			{
+			if ( pObject ){
 				m_Pool.Push( reinterpret_cast<T*>(pObject) );
 			}
 		}
-		void DeleteObject(void* pObject)
-		{
+		void DeleteObject(void* pObject){
 			assert(pObject);
-			if ( pObject )
-			{
+			if ( pObject ){
 				( reinterpret_cast<T*>(pObject) )->~T();
 				FreeToPool(pObject);
 			}
 		}
-		void ClearPool()
-		{
+		void ClearPool(){
 			T* pTemp = nullptr;
-			while( (pTemp = m_Pool.Pop()) )
-			{
+			while( (pTemp = m_Pool.Pop()) ){
 				::free(pTemp);
 			}
 		}
 
 	private:
-		void AllocBlock()
-		{
+		void AllocBlock(){
 			assert(ALLOC_BLOCK_SIZE>0);
-			for ( size_t nCount=0;nCount<ALLOC_BLOCK_SIZE;++nCount )
-			{
+			for ( size_t nCount=0;nCount<ALLOC_BLOCK_SIZE;++nCount ){
 				T* pTemp = reinterpret_cast<T*>(::malloc(sizeof(T)));
-				if ( pTemp )
-				{
+				if ( pTemp ){
 					++m_nTotalMalloc;
 					m_Pool.Push(pTemp);
 				}
@@ -184,25 +74,21 @@ namespace Mogui
 	};
 
 	template<typename T, size_t ALLOC_BLOCK_SIZE=10>
-	class CMemoryPool_Public
-	{
+	class CMemoryPool_Public{
 	public:
 		CMemoryPool_Public(void){}
 		virtual ~CMemoryPool_Public(){}	
 
-		static void* operator new(size_t nAllocSize)
-		{
+		static void* operator new(size_t nAllocSize){
 			assert(nAllocSize == sizeof(T));
 			InterlockedIncrement64(&s_nNewTimes);
 			return m_MemoryPool.AllocFromPool();
 		}
-		static void operator delete(void* pFree)
-		{
+		static void operator delete(void* pFree){
 			InterlockedIncrement64(&s_nDeleteTimes);
 			m_MemoryPool.DeleteObject(pFree);
 		}
-		static void Clear()
-		{
+		static void Clear(){
 			m_MemoryPool.ClearPool();
 		}
 
@@ -229,4 +115,5 @@ namespace Mogui
 
 	template<typename T, size_t ALLOC_BLOCK_SIZE>
 	long long volatile CMemoryPool_Public<T,ALLOC_BLOCK_SIZE>::s_nDeleteTimes = 0;
+
 };

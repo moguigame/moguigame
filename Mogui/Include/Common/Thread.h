@@ -5,13 +5,11 @@
 #include "Lock.h"
 #include "Condition.h"
 
-namespace Mogui
-{
+namespace Mogui{
+
 	class CLock;
 	class CCondition;
-
-	class  CThread : public boost::noncopyable
-	{
+	class  CThread : public boost::noncopyable{
 	public:
 		explicit CThread(const std::string& name = "");
 		virtual ~CThread(void);
@@ -35,5 +33,6 @@ namespace Mogui
 		CLock              m_Lock;
 		CCondition         m_Condition;
 	};
+
 }
 

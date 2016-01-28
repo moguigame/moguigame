@@ -4,10 +4,9 @@
 
 #include "boost/utility.hpp"
 
-namespace Mogui
-{
-	class CLock : public boost::noncopyable
-	{
+namespace Mogui{
+
+	class CLock : public boost::noncopyable{
 	public:
 		CLock(void);
 		~CLock(void);
@@ -21,8 +20,7 @@ namespace Mogui
 		CRITICAL_SECTION     m_lock;
 	};
 
-	class CSelfLock : public boost::noncopyable
-	{
+	class CSelfLock : public boost::noncopyable{
 	public:
 		explicit CSelfLock(CLock& lock);
 		~CSelfLock(void);
@@ -30,6 +28,7 @@ namespace Mogui
 	private:
 		CLock &m_lock;
 	};
+
 }
 
 

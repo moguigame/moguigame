@@ -3,52 +3,41 @@
 namespace Mogui
 {
 	//----------CRWLock---------------------------
-	CRWLock::CRWLock()
-	{
+	CRWLock::CRWLock(){
 		::InitializeSRWLock(&m_lock);
 	}
-	CRWLock::~CRWLock()
-	{
-
+	CRWLock::~CRWLock(){
 	}
-	void CRWLock::ShareLock()
-	{
+	void CRWLock::ShareLock(){
 		::AcquireSRWLockShared(&m_lock);
 	}
-	void CRWLock::UnShareLock()
-	{
+	void CRWLock::UnShareLock(){
 		::ReleaseSRWLockShared(&m_lock);
 	}
-	void CRWLock::ExclusiveLock()
-	{
+	void CRWLock::ExclusiveLock(){
 		::AcquireSRWLockExclusive(&m_lock);
 	}
-	void CRWLock::UnExclusiveLock()
-	{
+	void CRWLock::UnExclusiveLock(){
 		::ReleaseSRWLockExclusive(&m_lock);
 	}
-	SRWLOCK* CRWLock::GetRW()
-	{
+	SRWLOCK* CRWLock::GetRW(){
 		return &m_lock;
 	}
 
 	//----------CReadLock---------------------------
-	CReadLock::CReadLock(CRWLock& lock):m_lock(lock)
-	{
+	CReadLock::CReadLock(CRWLock& lock):m_lock(lock){
 		m_lock.ShareLock();
 	}
-	CReadLock::~CReadLock()
-	{
+	CReadLock::~CReadLock(){
 		m_lock.UnShareLock();
 	}
 
 	//----------CWriteLock---------------------------
-	CWriteLock::CWriteLock(CRWLock& lock):m_lock(lock)
-	{
+	CWriteLock::CWriteLock(CRWLock& lock):m_lock(lock){
 		m_lock.ExclusiveLock();
 	}
-	CWriteLock::~CWriteLock()
-	{
+	CWriteLock::~CWriteLock(){
 		m_lock.UnExclusiveLock();
 	}
+
 }

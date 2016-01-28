@@ -1,9 +1,7 @@
 #pragma once
 
-namespace Mogui
-{
-	enum LogLevel
-	{
+namespace Mogui{
+	enum LogLevel{
 		LOGLEVEL_DEBUG	= 1,
 		LOGLEVEL_INFO	= 2,
 		LOGLEVEL_WARN	= 4,

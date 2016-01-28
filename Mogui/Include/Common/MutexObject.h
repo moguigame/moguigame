@@ -3,10 +3,9 @@
 #include <string>
 #include "boost\utility.hpp"
 
-namespace Mogui
-{
-	class CMutexObject : public boost::noncopyable
-	{
+namespace Mogui{
+
+	class CMutexObject : public boost::noncopyable{
 	public:
 		explicit CMutexObject(bool bInitOwer,const std::string& strName=std::string(""));
 		~CMutexObject(void);
@@ -21,8 +20,7 @@ namespace Mogui
 		std::string m_strName;
 	};
 
-	class CSelfMutex : public boost::noncopyable
-	{
+	class CSelfMutex : public boost::noncopyable{
 	public:
 		explicit CSelfMutex(CMutexObject& mutex);
 		~CSelfMutex(void);
@@ -30,5 +28,6 @@ namespace Mogui
 	private:
 		CMutexObject &m_Mutex;
 	};
+
 }
 

@@ -5,25 +5,22 @@
 #include <cassert>
 #include <cstdio>
 
-namespace Mogui
-{
-	static unsigned int __stdcall ThreadFunc(void* pVal)
-	{
+namespace Mogui{
+
+	static unsigned int __stdcall ThreadFunc(void* pVal){
 		CThread *pThread = static_cast<CThread*>(pVal);
 		assert(pThread);
 
 		std::string ThreadName = pThread->GetName();
 		fprintf(stderr, "Info: thread %s is running\n", ThreadName.c_str());
 
-		try
-		{
+		try{
 			pThread->Run();
 			pThread->Broadcast();
 
 			fprintf(stderr, "Info: thread %s is end \n", ThreadName.c_str());
 		}
-		catch (...)
-		{
+		catch (...){
 			fprintf(stderr, "Error: thread %s run catch a err\n", ThreadName.c_str());
 		}
 
@@ -32,34 +29,26 @@ namespace Mogui
 
 	CThread::CThread(const std::string& name):m_hThread(INVALID_HANDLE_VALUE)
 		,m_Name(name),
-		m_bRunning(false)
-	{
+		m_bRunning(false){
 	}
 
-	CThread::~CThread(void)
-	{
+	CThread::~CThread(void){
 		Terminate(100);
 	}
 
-	std::string CThread::GetName() const 
-	{ 
+	std::string CThread::GetName() const { 
 		return m_Name; 
 	}
-	bool CThread::IsRunning() 
-	{
+	bool CThread::IsRunning(){
 		return m_bRunning;
 	}
-	bool CThread::IsStop()
-	{
+	bool CThread::IsStop(){
 		return !m_bRunning; 
 	}
 
-	bool CThread::Start()
-	{
+	bool CThread::Start(){
 		CSelfLock sl(m_Lock);
-
-		if ( m_hThread != INVALID_HANDLE_VALUE || m_bRunning )
-		{
+		if ( m_hThread != INVALID_HANDLE_VALUE || m_bRunning ){
 			fprintf(stderr, "Error: Start thread %s running \n",m_Name.c_str());
 			return false;
 		}
@@ -70,8 +59,7 @@ namespace Mogui
 		m_hThread = (HANDLE)(::_beginthreadex(0,0,&ThreadFunc,(void*)this,0,&ThreadID));
 		assert(m_hThread != NULL);
 		assert(m_hThread != INVALID_HANDLE_VALUE);
-		if ( m_hThread == INVALID_HANDLE_VALUE || m_hThread == NULL )
-		{
+		if ( m_hThread == INVALID_HANDLE_VALUE || m_hThread == NULL ){
 			int ErrID = ::GetLastError();
 			fprintf(stderr, "Error: Start thread %s ErrorID=%d \n",m_Name.c_str(),ErrID);
 
@@ -82,39 +70,30 @@ namespace Mogui
 		return true;
 	}
 
-	void CThread::Terminate(unsigned int ms)
-	{
+	void CThread::Terminate(unsigned int ms){
 		CSelfLock sl(m_Lock);
-
-		if ( m_bRunning )
-		{
+		if ( m_bRunning ){
 			m_bRunning = false;
-			if ( !m_Condition.Wait(m_Lock,ms) )
-			{
-				if ( m_hThread != INVALID_HANDLE_VALUE )
-				{
-					if ( GetCurrentThread() == m_hThread )
-					{
+			if ( !m_Condition.Wait(m_Lock,ms) ){
+				if ( m_hThread != INVALID_HANDLE_VALUE ){
+					if ( GetCurrentThread() == m_hThread ){
 						::_endthreadex(0);
 					}
-					else
-					{
+					else{
 						TerminateThread(m_hThread,0);
 					}					
 				}
 			}
-
-			if ( m_hThread != INVALID_HANDLE_VALUE )
-			{
+			if ( m_hThread != INVALID_HANDLE_VALUE ){
 				::CloseHandle(m_hThread);
 				m_hThread = INVALID_HANDLE_VALUE;
 			}
 		}
 	}
 
-	void CThread::Broadcast( void )
-	{
+	void CThread::Broadcast( void ){
 		CSelfLock l(m_Lock);
 		m_Condition.NotifyAll();
 	}
+
 }

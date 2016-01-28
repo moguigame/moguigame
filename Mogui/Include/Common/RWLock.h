@@ -4,10 +4,9 @@
 
 #include "boost/utility.hpp"
 
-namespace Mogui
-{
-	class CRWLock : public boost::noncopyable
-	{
+namespace Mogui{
+
+	class CRWLock : public boost::noncopyable{
 	public:
 		CRWLock(void);
 		~CRWLock(void);
@@ -24,8 +23,7 @@ namespace Mogui
 		SRWLOCK     m_lock;
 	};
 
-	class CWriteLock : public boost::noncopyable
-	{
+	class CWriteLock : public boost::noncopyable{
 	public:
 		explicit CWriteLock(CRWLock& lock);
 		~CWriteLock(void);
@@ -34,8 +32,7 @@ namespace Mogui
 		CRWLock &m_lock;
 	};
 
-	class CReadLock : public boost::noncopyable
-	{
+	class CReadLock : public boost::noncopyable{
 	public:
 		explicit CReadLock(CRWLock& lock);
 		~CReadLock(void);
@@ -43,4 +40,5 @@ namespace Mogui
 	private:
 		CRWLock &m_lock;
 	};
+
 }

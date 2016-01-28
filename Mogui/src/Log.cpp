@@ -27,11 +27,9 @@ namespace Mogui
 
 	static const char* g_logDesc[4] = {	" [DEBUG] "," [INFO ] "," [WARN ] "," [ERROR] "};
 
-	class CLogThread : public CThread
-	{
+	class CLogThread : public CThread{
 	public:
-		class CLogPacket : public CMemoryPool_Public<CLogPacket, 10>
-		{
+		class CLogPacket : public CMemoryPool_Public<CLogPacket, 10>{
 		public:
 			unsigned char	level;
 			unsigned char	type;
@@ -40,8 +38,7 @@ namespace Mogui
 			char	        log[MAX_LOG_LEN+1];
 		};
 
-		CLogThread( void ) : CThread( "logthread" )
-		{
+		CLogThread( void ) : CThread( "logthread" ){
 			m_init			= false;
 			m_bDirCreated	= false;
 			m_nLogLevel		= LOGLEVEL_ALL;
@@ -49,8 +46,7 @@ namespace Mogui
 			m_nMonth		= 0;
 		}
 
-		void Init( const char* prefix, int level )
-		{
+		void Init( const char* prefix, int level ){
 			CSelfLock l(m_packetlock);
 
 			if ( m_init ) return;
@@ -59,46 +55,38 @@ namespace Mogui
 			m_sLogRootDir = GetModulePath()+"log/";
 			m_nLogLevel = level;
 
-			if ( prefix )	m_sFilePrefix = std::string(prefix);
+			if ( prefix ){
+				m_sFilePrefix = std::string(prefix);
+			}
 
 			CreateMonthDir();
-
 			Start( );
 		}
 
-		void Fini( void )
-		{
+		void Fini( void ){
 			CSelfLock l(m_packetlock);
 
 			Terminate( );
-
-			if( m_fp.is_open() )
-			{
+			if( m_fp.is_open() ){
 				m_fp.close();
 			}
 
 			CLogPacket* packet = 0;
-			while ( !m_packets.empty() )
-			{
+			while ( !m_packets.empty() ){
 				packet = m_packets.front( );
 				m_packets.pop_front();
-
 				delete packet;
 			}
-
 			m_init = false;
 		}
 
-		bool IsHaveInit()
-		{
+		bool IsHaveInit(){
 			return m_init;
 		}
-		bool IsLevelLog( int level )
-		{
+		bool IsLevelLog( int level ){
 			return (level & m_nLogLevel) > 0;
 		}
-		int  LevelToIdx( int level )
-		{
+		int  LevelToIdx( int level ){
 			int Idx = 0;
 			switch(level)
 			{
@@ -120,62 +108,48 @@ namespace Mogui
 			return Idx;
 		}
 
-		void PostLog( CLogPacket* logpacket )
-		{
+		void PostLog( CLogPacket* logpacket ){
 			if ( 0 == logpacket )	return;
 			if ( 0 == logpacket->len ) return;
 
 			CSelfLock l(m_packetlock);
 
 			logpacket->logtime = time(NULL);
-			if ( m_packets.size()>=MAX_LOG_COUNT )
-			{
+			if ( m_packets.size()>=MAX_LOG_COUNT ){
 				delete logpacket;
 				return;
 			}
 
 			m_packets.push_back( logpacket );
-			if ( m_packets.size() == 1 )
-			{
+			if ( m_packets.size() == 1 ){
 				m_packetCondition.Notify();
 			}
 		}
 
 	protected:
-		int Run( void )
-		{
+		int Run( void ){
 			CLogPacket* packet = 0;
-			while ( IsRunning() )
-			{
+			while ( IsRunning() ){
 				{
 					CSelfLock l(m_packetlock);
-
-					if ( m_packets.empty() )
-					{
+					if ( m_packets.empty() ){
 						m_packetCondition.Wait(m_packetlock);
 					}
-
-					if ( !m_packets.empty() )
-					{
+					if ( !m_packets.empty() ){
 						packet = m_packets.front( );
 						m_packets.pop_front();
 					}
 				}
-
-				if ( packet )
-				{
+				if ( packet ){
 					Log_Text_2File( packet );
-
 					delete packet;
 					packet = 0;
 				}
 			}
-
 			return 0;
 		}
 
-		std::string GetModulePath()
-		{
+		std::string GetModulePath(){
 			char szFile[MAX_PATH];
 			::GetModuleFileNameA(GetModuleHandle(NULL), szFile, MAX_PATH);
 
@@ -185,60 +159,58 @@ namespace Mogui
 			strncat_s(szDrive,MAX_PATH,szPath,sizeof(szDrive)-strnlen(szDrive,MAX_PATH)-1);
 
 			std::string ret = szDrive;
-			if ( ret.find_last_of('\\') != ret.length()-1 && ret.find_first_of('/') != ret.length()-1 )
-			{
+			if ( ret.find_last_of('\\') != ret.length()-1 && ret.find_first_of('/') != ret.length()-1 ){
 				ret.append("\\");
 			}
 
 			return ret;
 		};
 
-		bool CreateDir(const char * path)
-		{
-			if( PathFileExistsA( path ) ) return true;
+		bool CreateDir(const char * path){
+			if( PathFileExistsA( path ) ){
+				return true;
+			}
 			return ( CreateDirectoryA( path, NULL ) == TRUE );
 		}
 
-		void CreateMonthDir()
-		{
+		void CreateMonthDir(){
 			time_t now = time(NULL);
 			struct tm t;
 			time_to_tm( &now, &t);
 
 			char subDir[TempBufSize];
-
 			m_bDirCreated = false;
-
 			sprintf_s( subDir,TempBufSize,"%s%d-%d/", m_sLogRootDir.c_str(), t.tm_year+1900, t.tm_mon+1 );
 
-			if( !CreateDir( m_sLogRootDir.c_str() ) )	return;
+			if( !CreateDir( m_sLogRootDir.c_str() ) ){
+				return;
+			}
 			m_sLogDir = subDir;
 
-			if( !CreateDir( m_sLogDir.c_str()) )		return;
+			if( !CreateDir( m_sLogDir.c_str()) ){
+				return;
+			}
 			m_bDirCreated = true;
 			m_nMonth = t.tm_mon;
 		}
 
-		void Log_Text_2File( CLogPacket* logpacket )
-		{
+		void Log_Text_2File( CLogPacket* logpacket ){
 			time_t logtime  = logpacket->logtime;
 			struct tm		t;
 			bool			bMonthChange = false;
 
 			time_to_tm( &logtime, &t);
-
-			if( t.tm_mon!=m_nMonth )
-			{
+			if( t.tm_mon!=m_nMonth ){
 				CreateMonthDir();
 				bMonthChange = true;
 			}
 
-			if( !m_bDirCreated ) return;
+			if( !m_bDirCreated ){
+				return;
+			}
 
-			if( !m_fp.is_open() || m_nDate!=t.tm_mday || bMonthChange )
-			{
-				if( m_fp.is_open() )
-				{
+			if( !m_fp.is_open() || m_nDate!=t.tm_mday || bMonthChange ){
+				if( m_fp.is_open() ){
 					m_fp.close();
 				}
 
@@ -248,7 +220,6 @@ namespace Mogui
 				if ( !m_fp.is_open() )	return;
 				m_nDate = t.tm_mday;
 			}
-
 			m_fp<<GetDateTimeString(logtime)<<g_logDesc[LevelToIdx(logpacket->level)]<<logpacket->log<<std::endl;
 		}
 
@@ -393,27 +364,26 @@ namespace Mogui
 		g_logthread.Fini( );
 	}
 
-	void Log_Text( int level, const char * str )
-	{
-		if ( !g_logthread.IsHaveInit() ) return;
-		if ( !g_logthread.IsLevelLog(level) ) return;
+	void Log_Text( int level, const char * str ){
+		if ( !g_logthread.IsHaveInit() ){
+			return;
+		}
+		if ( !g_logthread.IsLevelLog(level) ){
+			return;
+		}
 
 		int pos = 0;
 		int leftlen = (int)strlen(str);
-		while ( leftlen > 0 )
-		{
+		while ( leftlen > 0 ){
 			CLogThread::CLogPacket* packet = new CLogThread::CLogPacket( );
 
 			packet->level   = level;
 			packet->type    = 0;
-
-			if ( leftlen>MAX_LOG_LEN )
-			{
+			if ( leftlen>MAX_LOG_LEN ){
 				memcpy( packet->log, str+pos, MAX_LOG_LEN );
 				packet->len = MAX_LOG_LEN;
 			}
-			else
-			{
+			else{
 				memcpy( packet->log, str+pos, leftlen );
 				packet->len = leftlen;
 			}
@@ -425,10 +395,13 @@ namespace Mogui
 		} 
 	}
 
-	void Log_Text_Format( int level, char* szstr, ... )
-	{
-		if ( !g_logthread.IsHaveInit() ) return;
-		if ( !g_logthread.IsLevelLog(level) ) return;
+	void Log_Text_Format( int level, char* szstr, ... ){
+		if ( !g_logthread.IsHaveInit() ){
+			return;
+		}
+		if ( !g_logthread.IsLevelLog(level) ){
+			return;
+		}
 
 		CLogThread::CLogPacket* packet = new CLogThread::CLogPacket( );
 
