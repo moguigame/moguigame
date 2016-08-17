@@ -12,7 +12,7 @@ namespace Mogui{
 	public:
 		CLock_Stack(){}
 		~CLock_Stack(){}
-		size_t GetSize() { return m_pData.size(); }
+		size_t GetSize() { CSelfLock sl(m_Lock);return m_pData.size(); }
 
 		void Push(T* pData){
 			if ( pData != nullptr ){
@@ -40,7 +40,7 @@ namespace Mogui{
 	public:
 		CLock_Queue(){}
 		~CLock_Queue(){}
-		size_t GetSize() { return m_pData.size(); }
+		size_t GetSize() { CSelfLock sl(m_Lock);return m_pData.size(); }
 
 		void Push(T* pData){
 			if ( pData != nullptr ){
@@ -68,7 +68,7 @@ namespace Mogui{
 	public:
 		CLock_Deque(){}
 		~CLock_Deque(){}
-		size_t GetSize() { return m_pData.size(); }
+		size_t GetSize() { CSelfLock sl(m_Lock);return m_pData.size(); }
 
 		void Push(T* pData){
 			if ( pData != nullptr ){

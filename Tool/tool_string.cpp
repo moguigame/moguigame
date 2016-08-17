@@ -3,9 +3,6 @@
 #include <cstdio>
 #include <algorithm>
 
-#include "boost\algorithm\string.hpp"
-#include "boost\utility.hpp"
-
 using std::string;
 using std::vector;
 using std::map;

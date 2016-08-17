@@ -19,11 +19,11 @@
 
 #pragma comment(lib,"Shlwapi.lib")
 
-namespace Mogui
-{
+namespace Mogui{
+
 	const int   MAX_LOG_LEN      = 1024;
-	const int   MAX_LOG_COUNT    = 1024;
-	const int   TempBufSize      = 255;
+	const int   MAX_LOG_COUNT    = 4096;
+	const int   FileNameBufSize  = 256;
 
 	static const char* g_logDesc[4] = {	" [DEBUG] "," [INFO ] "," [WARN ] "," [ERROR] "};
 
@@ -31,6 +31,9 @@ namespace Mogui
 	public:
 		class CLogPacket : public CMemoryPool_Public<CLogPacket, 10>{
 		public:
+			CLogPacket(){ Reset();}
+			void Reset(){ memset(this,0,sizeof(*this));}
+
 			unsigned char	level;
 			unsigned char	type;
 			int		        len;
@@ -175,12 +178,12 @@ namespace Mogui
 
 		void CreateMonthDir(){
 			time_t now = time(NULL);
-			struct tm t;
-			time_to_tm( &now, &t);
+			struct tm t;			
+			localtime_s(&t,&now);
 
-			char subDir[TempBufSize];
+			char subDir[FileNameBufSize];
 			m_bDirCreated = false;
-			sprintf_s( subDir,TempBufSize,"%s%d-%d/", m_sLogRootDir.c_str(), t.tm_year+1900, t.tm_mon+1 );
+			sprintf_s( subDir,FileNameBufSize,"%s%d-%d/", m_sLogRootDir.c_str(), t.tm_year+1900, t.tm_mon+1 );
 
 			if( !CreateDir( m_sLogRootDir.c_str() ) ){
 				return;
@@ -198,8 +201,8 @@ namespace Mogui
 			time_t logtime  = logpacket->logtime;
 			struct tm		t;
 			bool			bMonthChange = false;
-
-			time_to_tm( &logtime, &t);
+			
+			localtime_s(&t,&logtime);
 			if( t.tm_mon!=m_nMonth ){
 				CreateMonthDir();
 				bMonthChange = true;
@@ -214,8 +217,8 @@ namespace Mogui
 					m_fp.close();
 				}
 
-				char file[TempBufSize];
-				sprintf_s( file,TempBufSize,"%s%s_%02d-%02d-%02d.log", m_sLogDir.c_str(), m_sFilePrefix.c_str(), t.tm_year+1900, t.tm_mon+1, t.tm_mday );
+				char file[FileNameBufSize];
+				sprintf_s( file,FileNameBufSize,"%s%s_%02d-%02d-%02d.log", m_sLogDir.c_str(), m_sFilePrefix.c_str(), t.tm_year+1900, t.tm_mon+1, t.tm_mday );
 				m_fp.open( file, std::ios::out|std::ios::app);
 				if ( !m_fp.is_open() )	return;
 				m_nDate = t.tm_mday;
@@ -239,111 +242,12 @@ namespace Mogui
 		int					    m_nMonth;
 
 	private:
-		int time_to_tm(time_t* time_input,struct tm* tm_result)
-		{
-			static const char month_days[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-			static const bool leap_year[4] = {false, false, true, false};
-
-			unsigned int leave_for_fouryear = 0;
-			unsigned short four_year_count = 0;
-			unsigned int temp_value = 0;
-
-			unsigned int nInputTime = unsigned int(*time_input);
-
-			tm_result->tm_sec = int(nInputTime % 60);
-			temp_value = int(nInputTime / 60);// 分钟
-			tm_result->tm_min = temp_value % 60;
-			temp_value /= 60; // 小时
-
-			temp_value += 8;// 加上时区
-
-			tm_result->tm_hour = temp_value % 24;
-			temp_value /= 24; // 天
-
-			tm_result->tm_wday = (temp_value + 4) % 7;// 1970-1-1是4
-
-			four_year_count = unsigned short(temp_value / (365 * 4 + 1));
-			leave_for_fouryear = temp_value % (365 * 4 + 1);
-			int leave_for_year_days = leave_for_fouryear;
-
-			int day_count = 0;
-			int i = 0;
-
-			for (i = 0; i < 4; i++)
-			{        
-				day_count = leap_year[i] ? 366 : 365;
-
-				if (leave_for_year_days < day_count)
-				{
-					break;
-				}
-				else
-				{
-					leave_for_year_days -= day_count;
-				}
+		std::string GetDateTimeString(  time_t curTime ){
+			if ( curTime == 0 ){
+				curTime = time(NULL);
 			}
-
-			tm_result->tm_year = four_year_count * 4 + i + 70;
-			tm_result->tm_yday = leave_for_year_days;// 这里不是天数，而是标记，从0开始
-
-			int leave_for_month_days = leave_for_year_days;
-
-			int j = 0;
-			for (j = 0; j < 12; j++)
-			{
-				if (leap_year[i] && j == 1)
-				{
-					if (leave_for_month_days < 29)
-					{
-						break;
-					}
-					else if (leave_for_month_days == 29)
-					{
-						j++;
-						leave_for_month_days = 0;
-						break;
-					}
-					else
-					{
-						leave_for_month_days -= 29;
-					}
-
-					continue;    
-				}
-
-				if (leave_for_month_days < month_days[j])
-				{
-					break;
-				}
-				else if(leave_for_month_days == month_days[j]){
-					j++;
-					leave_for_month_days = 0;
-					break;
-				}
-				else
-				{
-					leave_for_month_days -= month_days[j];
-				}                
-			}
-
-			tm_result->tm_mday = leave_for_month_days + 1;
-			tm_result->tm_mon = j;
-			if ( tm_result->tm_mon >= 12 )
-			{
-				tm_result->tm_year++;
-				tm_result->tm_mon -= 12;
-			}
-			tm_result->tm_isdst = 0;
-
-			return 0;
-		}
-
-		std::string GetDateTimeString(  time_t curTime )
-		{
-			if ( curTime == 0 ) curTime = time(NULL);
-
-			struct tm t;
-			time_to_tm( &curTime, &t );
+			struct tm t;			
+			localtime_s(&t,&curTime);
 
 			char curtime[256];
 			sprintf_s( curtime,256,"%04d-%02d-%02d %02d:%02d:%02d", t.tm_year+1900, t.tm_mon+1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
@@ -353,14 +257,11 @@ namespace Mogui
 	};
 
 	static CLogThread g_logthread;
-
-	void InitLogger( const char* prefix, int level )
-	{
+	void InitLogger( const char* prefix, int level ){
 		g_logthread.Init( prefix, level );
 	}
 
-	void FiniLogger( void )
-	{
+	void FiniLogger( void ){
 		g_logthread.Fini( );
 	}
 

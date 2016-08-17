@@ -3,15 +3,13 @@
 #include "MemoryPool.h"
 #include "SocketDefine.h"
 
-namespace Mogui
-{
+namespace Mogui{
+
 	class CConnect;
 
-	class CPacket : public CMemoryPool_Public<CPacket>
-	{
+	class CPacket : public CMemoryPool_Public<CPacket>{
 	public:
-		enum PacketType
-		{
+		enum PacketType{
 			PT_DATA	= 0,
 			PT_ACCEPT,
 			PT_CONNECT,
@@ -20,10 +18,8 @@ namespace Mogui
 		};
 
 		CPacket( void ) : m_next( 0 ), m_socket( 0 ), m_used( 0 ), m_type( 0 )
-			, m_callback( 0 )
-		{
-			m_buffer[0] = 0;
-			m_StartTick = 0;
+			, m_callback( 0 ),m_StartTick(0){			
+			memset(m_buffer,0,sizeof(m_buffer));
 		}
 
 		CPacket*		    m_next;
@@ -38,18 +34,14 @@ namespace Mogui
 	class CPacketQueue
 	{
 	public:
-		CPacketQueue( void ) : m_head( 0 ), m_tail( 0 ), m_InPacket( 0 ), m_OutPacket( 0 )
-		{
+		CPacketQueue( void ) : m_head( 0 ), m_tail( 0 ), m_InPacket( 0 ), m_OutPacket( 0 ){
 		}
-
-		~CPacketQueue( void )
-		{
+		~CPacketQueue( void ){
 			Clear( );
 			Init();
 		}
 
-		void Init()
-		{
+		void Init(){
 			m_InPacket = 0;
 			m_OutPacket = 0;
 
@@ -57,41 +49,32 @@ namespace Mogui
 			m_tail = 0;
 		}
 
-		void PushPacket( CPacket* packet )
-		{
-			if ( packet )
-			{
-				packet->m_next = 0;
+		void PushPacket( CPacket* packet ){
+			if ( packet ){
+				packet->m_next      = 0;
 				packet->m_StartTick = GetTickCount64();
 
-				if ( m_tail )
-				{
+				if ( m_tail ){
 					m_tail->m_next = packet;
-					m_tail = packet;
+					m_tail         = packet;
 				}
-				else
-				{
+				else{
 					m_head = m_tail = packet;
 				}
-
 				m_InPacket++;
 			}
 		}
 
-		void PushQueue( CPacketQueue& queue )
-		{
-			if ( queue.IsEmpty() )
-			{
+		void PushQueue( CPacketQueue& queue ){
+			if ( queue.IsEmpty() ){
 				return;
 			}
 
-			if ( m_tail )
-			{
+			if ( m_tail ){
 				m_tail->m_next = queue.m_head;
 				m_tail		   = queue.m_tail;
 			}
-			else
-			{
+			else{
 				m_head	= queue.m_head;;
 				m_tail  = queue.m_tail;
 			}
@@ -100,46 +83,43 @@ namespace Mogui
 			queue.Init();
 		}
 
-		CPacket* PopPacket( void )
-		{
-			if ( m_head==0 ) return 0;
+		CPacket* PopPacket( void ){
+			if ( m_head==0 ){
+				return 0;
+			}
 
 			CPacket* packet = m_head;
 			m_head	= packet->m_next;
 			packet->m_next	= 0;
-
-			if( m_tail==packet ) m_tail = 0;
-
 			m_OutPacket++;
 
+			if( m_tail==packet ){
+				m_tail = 0;
+			}
 			return packet;
 		}
 
-		bool IsEmpty( void )
-		{
+		bool IsEmpty( void ){
 			return m_head==0;
 		}
 
-		void DeleteClearAll( void )
-		{
+		void DeleteClearAll( void ){
 			CPacket* packet = 0;
-			while ( (packet=PopPacket()) )
-			{
+			while ( (packet=PopPacket()) ){
 				delete packet;
 			}
+			assert( m_InPacket == m_OutPacket);
 		}
 
-		void Clear( void )
-		{
+		void Clear( void ){
 			CPacket* packet = 0;
-			while ( (packet=PopPacket()) )
-			{
+			while ( (packet=PopPacket()) ){
 				delete packet;
 			}
+			assert( m_InPacket == m_OutPacket);
 		}
 
-		int Size( void )
-		{
+		int Size( void ){
 			assert(m_InPacket - m_OutPacket>=0);
 			return int(m_InPacket - m_OutPacket);
 		}
@@ -147,6 +127,7 @@ namespace Mogui
 		long long GetInPakcet(){ return m_InPacket; }
 		long long GetOutPacket(){ return m_OutPacket; }
 
+	private:
 		CPacket*	m_head;
 		CPacket*	m_tail;
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <windows.h>
+
 #include <cassert>
 #include <stack>
 #include <deque>
@@ -58,7 +60,7 @@ namespace Mogui{
 			for ( size_t nCount=0;nCount<ALLOC_BLOCK_SIZE;++nCount ){
 				T* pTemp = reinterpret_cast<T*>(::malloc(sizeof(T)));
 				if ( pTemp ){
-					++m_nTotalMalloc;
+					::InterlockedIncrement(&m_nTotalMalloc);					
 					m_Pool.Push(pTemp);
 				}
 			}

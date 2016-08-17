@@ -14,8 +14,7 @@
 
 namespace Mogui
 {
-	template<class T> void safe_delete(T* pData)
-	{
+	template<class T> void safe_delete(T* pData){
 		if ( pData ){ delete pData;	pData = nullptr;}
 	}
 
