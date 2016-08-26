@@ -119,7 +119,7 @@ namespace Mogui
 			}
 			m_TotalFinishPacket++;
 
-			m_TotalWaitTime += (GetTickCount64() - packet->m_StartTick);
+			m_TotalWaitTime += (GetTickCount64() - packet->m_starttick);
 
 			OnPacket( packet );
 			safe_delete(packet);

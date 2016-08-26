@@ -5,6 +5,9 @@
 #include <deque>
 #include <queue>
 
+#include <boost/noncopyable.hpp>
+#include "Common/Lock.h"
+
 namespace Mogui{
 
 	template<typename T>

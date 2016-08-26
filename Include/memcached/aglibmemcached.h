@@ -13,8 +13,8 @@ class MemCacheClient;
 
 typedef MemCacheClient slibmemcached;
 
-const time_t		LIBMEMCACHED_DEFAULT_EXP_TIME	= 43200;
-const unsigned int	LIBMEMCACHED_MAX_BUFFLEN		= 40960;
+const time_t		LIBMEMCACHED_DEFAULT_EXP_TIME	= 3600*24;
+const unsigned int	LIBMEMCACHED_MAX_BUFFLEN		= 4096*8;
 
 class CAGLibmemcached
 {
@@ -71,10 +71,8 @@ bool CAGLibmemcached::Set_Data(const std::string& key, const T& value, time_t ex
 	if( !_memc )				return false;
 	if( !agmem_checkkey(key) )	return false;
 	if( !agmem_checkvalue(sizeof(T)) )	return false;
-
-	int bufsize = sizeof(T)+1;
-	char *buffer = new char[bufsize];
-	//char buffer[LIBMEMCACHED_MAX_BUFFLEN];
+	
+	char buffer[LIBMEMCACHED_MAX_BUFFLEN]={0};
 	bostream bos;
 	bos.attach(buffer, bufsize);
 
@@ -88,8 +86,6 @@ bool CAGLibmemcached::Set_Data(const std::string& key, const T& value, time_t ex
 	{
 		fprintf(stderr, "CAGLibmemcached::Set_Data catch bos err\n");
 	}
-
-	delete []buffer;
 	return flag;
 }
 
@@ -100,10 +96,8 @@ bool CAGLibmemcached::Replace_Data(const std::string& key, const T& value, time_
 	if( !_memc )				return false;
 	if( !agmem_checkkey(key) )	return false;
 	if( !agmem_checkvalue(sizeof(T)) )	return false;
-
-	int bufsize = sizeof(T)+1;
-	char *buffer = new char[bufsize];
-	//char buffer[LIBMEMCACHED_MAX_BUFFLEN];
+	
+	char buffer[LIBMEMCACHED_MAX_BUFFLEN]={0};
 	bostream bos;
 	bos.attach(buffer, bufsize);
 
@@ -118,7 +112,6 @@ bool CAGLibmemcached::Replace_Data(const std::string& key, const T& value, time_
 		fprintf(stderr, "CAGLibmemcached::Replace_Data catch bos err\n");
 	}
 
-	delete []buffer;
 	return flag;
 }
 

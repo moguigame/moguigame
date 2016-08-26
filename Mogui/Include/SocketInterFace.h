@@ -6,8 +6,8 @@
 
 #include <string>
 
-namespace Mogui
-{
+namespace Mogui{
+
 	//服务器端 客户端 通用连接池
 	class IConnectPool;				//连接池接口，调用本接口的Start方法之后，主线程将被阻塞，处理socket事件。IConnectPool还提供定时器服务。
 	class IConnectPoolCallback;		//IConnectPool的回调接口，服务器程序需要实现本接口来实现定时器，异步消息等功能。

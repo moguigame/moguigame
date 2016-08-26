@@ -6,7 +6,6 @@
 
 namespace Tool
 {
-	//×Ö·û´®µÄ´¦Àí
 	extern std::vector<std::string>              SplitString(const std::string& src, const std::string& trim);
 	extern std::map<std::string, long long>      GetRuleMapInData(const std::string& src, const std::string& strFirst, const std::string& strSecond);
 	extern std::map<std::string, std::string>    GetRuleMapInString(const std::string& src, const std::string& strFirst, const std::string& strSecond);

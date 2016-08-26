@@ -1,4 +1,4 @@
-#include "tool\tool_time.h"
+#include "..\tool\tool_time.h"
 
 #include <Windows.h>
 #include <Winbase.h>

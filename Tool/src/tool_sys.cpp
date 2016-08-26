@@ -4,7 +4,7 @@
 #include <Iphlpapi.h>
 #include <winbase.h>
 
-#include "tool\tool_sys.h"
+#include "..\tool\tool_sys.h"
 
 extern "C"
 {

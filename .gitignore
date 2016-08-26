@@ -26,7 +26,8 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Icon must ends with two \r.
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -133,3 +134,4 @@ Server/BaseServer/Debug/RZRQServer_manifest.rc
 Server/BaseServer/RZRQServer.sln
 Server/RZRQServer/Debug/RZRQServer.exe
 Server/RZRQServer/Debug/RZRQServer.ilk
+Tool/Debug/Tool.unsuccessfulbuild

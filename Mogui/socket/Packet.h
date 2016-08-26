@@ -18,7 +18,7 @@ namespace Mogui{
 		};
 
 		CPacket( void ) : m_next( 0 ), m_socket( 0 ), m_used( 0 ), m_type( 0 )
-			, m_callback( 0 ),m_StartTick(0){			
+			, m_callback( 0 ),m_starttick(0){		
 			memset(m_buffer,0,sizeof(m_buffer));
 		}
 
@@ -28,7 +28,7 @@ namespace Mogui{
 		int				    m_type;
 		IConnectCallback*   m_callback;
 		char			    m_buffer[_MAX_BUFFER_LENGTH];
-		long long           m_StartTick;
+		long long           m_starttick;
 	};
 
 	class CPacketQueue
@@ -52,7 +52,7 @@ namespace Mogui{
 		void PushPacket( CPacket* packet ){
 			if ( packet ){
 				packet->m_next      = 0;
-				packet->m_StartTick = GetTickCount64();
+				packet->m_starttick = GetTickCount64();
 
 				if ( m_tail ){
 					m_tail->m_next = packet;
