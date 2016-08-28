@@ -20,14 +20,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -53,13 +53,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\\..\\..\\..\\Develop SDK\Include;..\\..\\include\\mogui;..\\..\\include\\memcached;..\\..\\include;include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\\..\\..\\Develop SDK\Include;..\\..\\include\\mogui;..\\..\\include\\memcached;..\\..\\include;include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\\..\\..\\..\\Develop SDK\Lib\OpenSSL;..\\..\\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\\..\\..\\Develop SDK\Lib\OpenSSL;..\\..\\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>MoguiD.lib;MemcachedD.lib;ToolD.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -72,7 +72,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\\..\\..\\..\\Develop SDK\Include;..\\..\\include\\mogui;..\\..\\include\\memcached;..\\..\\include;include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\\..\\..\\Develop SDK\Include;..\\..\\include\\mogui;..\\..\\include\\memcached;..\\..\\include;include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -80,7 +80,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\\..\\libs;..\\..\\..\\..\\Develop SDK\Lib\OpenSSL</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\\..\\libs;..\\..\\..\\Develop SDK\Lib\OpenSSL</AdditionalLibraryDirectories>
       <AdditionalDependencies>Mogui.lib;Memcached.lib;Tool.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

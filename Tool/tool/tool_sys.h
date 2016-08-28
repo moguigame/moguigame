@@ -12,4 +12,6 @@ namespace Tool
 
 	extern std::string  GetWinVersion();
 	extern int          GetCPUNumber();
+
+	extern std::string  GetLocalIP();
 }

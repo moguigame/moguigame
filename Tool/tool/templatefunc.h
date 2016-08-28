@@ -4,6 +4,8 @@
 #include<vector>
 #include<sstream>
 
+#include "tool_utils.h"
+
 template<class T> inline void safe_delete(T* pData){
 	if ( pData ){ delete pData;	pData = nullptr;}
 }
@@ -33,6 +35,19 @@ inline int CopyArrayByFun(T1* pDes,int nLen,T2* pSrc,bool (*Func)(T2) ){
 		}
 	}
 	return nCount;
+}
+
+template<typename T>
+inline void MixArray( T *pData,int nLen,int nTimes ){
+	int k,m;
+	for( int i=0;i<nTimes;++i ){
+		k = nLen;
+		for( int j=nLen-1;j>0;j-- ){
+			m = Random_Int(0,k-1);
+			std::swap(pData[k-1],pData[m]);
+			k--;
+		}
+	}
 }
 
 template<typename T>

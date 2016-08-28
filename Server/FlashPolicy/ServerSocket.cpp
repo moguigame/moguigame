@@ -6,9 +6,10 @@
 using namespace std;
 using namespace Mogui;
 
-CServerSocket::CServerSocket( CServer* server, IConnect* pConnect )
-{
-	m_pServer  = server;
+CServerSocket::CServerSocket( CServer* pServer, IConnect* pConnect ){
+	assert(pServer);
+	assert(pConnect);
+	m_pServer  = pServer;
 	m_pConnect = pConnect;
 	m_pConnect->SetCallback(this);
 
@@ -16,30 +17,26 @@ CServerSocket::CServerSocket( CServer* server, IConnect* pConnect )
 	m_SocketState = SOCKET_ST_NONE;
 }
 
-CServerSocket::~CServerSocket(void)
-{
+CServerSocket::~CServerSocket(void){
 	m_ConnectTime = 0;
 	m_pServer  = NULL;
 	m_pConnect = NULL;
 	m_SocketState = SOCKET_ST_NONE;
 }
 
-void CServerSocket::Close()
-{
+void CServerSocket::Close(){
 	if ( m_pConnect ){
 		m_SocketState = SOCKET_ST_CLOSING;
 		m_pConnect->Close();
 	}
 }
 
-void CServerSocket::OnConnect( void )
-{
+void CServerSocket::OnConnect( void ){
 	m_SocketState = SOCKET_ST_CONNECTED;
 	m_ConnectTime =  time(NULL);
 }
 
-int CServerSocket::OnMsg( const char* buf, int len )
-{
+int CServerSocket::OnMsg( const char* buf, int len ){
 	static char	recvflash[]     = "<policy-file-request/>";
 	static int	recvflashlen    = (int)strlen(recvflash);
 	static char	sendflash[]		= "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*\" to-ports=\"*\"/>\n</cross-domain-policy>";
@@ -55,8 +52,7 @@ int CServerSocket::OnMsg( const char* buf, int len )
 	}
 	return len;
 }
-void CServerSocket::OnClose( bool bactive )
-{
+void CServerSocket::OnClose( bool bactive ){
 	m_SocketState = SOCKET_ST_CONNECTED;
 	m_pServer->DealCloseSocket( m_pConnect );
 }

@@ -12,8 +12,7 @@ using namespace Tool;
 #pragma comment(lib, "libeay32.lib")
 #pragma comment(lib, "ssleay32.lib")
 
-CServer::CServer(void)
-{
+CServer::CServer(void){
 	m_bIsInitOK = false;
 
 	InitLogger( "FlashPolicy_log", LOGLEVEL_ALL );
@@ -27,8 +26,7 @@ CServer::CServer(void)
 
 	m_bIsInitOK = true;
 }
-CServer::~CServer(void)
-{
+CServer::~CServer(void){
 	MapClientSocket::iterator itorClient;
 	for(itorClient=m_Clients.begin();itorClient!=m_Clients.end();++itorClient){
 		if( itorClient->first ){
@@ -42,10 +40,9 @@ CServer::~CServer(void)
 
 	FiniLogger( );
 }
-void CServer::DebugError(const char* logstr,...)
-{
+void CServer::DebugError(const char* logstr,...){
 	static const int MAX_LOG_BUF_SIZE = 1024;
-	static char logbuf[MAX_LOG_BUF_SIZE]={0};
+	char logbuf[MAX_LOG_BUF_SIZE]={0};
 	va_list args;
 	va_start(args,logstr);
 	int len = _vsnprintf_s(logbuf, MAX_LOG_BUF_SIZE, logstr, args);
@@ -55,10 +52,9 @@ void CServer::DebugError(const char* logstr,...)
 		printf_s("%s Error %s \n",GetTimeString(m_CurTime).c_str(),logbuf );
 	}
 }
-void CServer::DebugInfo(const char* logstr,...)
-{
+void CServer::DebugInfo(const char* logstr,...){
 	static const int MAX_LOG_BUF_SIZE = 1024;
-	static char logbuf[MAX_LOG_BUF_SIZE] = {0};
+	char logbuf[MAX_LOG_BUF_SIZE] = {0};
 	va_list args;
 	va_start(args, logstr);
 	int len = _vsnprintf_s(logbuf, MAX_LOG_BUF_SIZE, logstr, args);
@@ -68,12 +64,10 @@ void CServer::DebugInfo(const char* logstr,...)
 		printf_s("%s Info  %s \n", GetTimeString(m_CurTime).c_str(), logbuf);
 	}
 }
-bool CServer::OnPriorityEvent( void )
-{
+bool CServer::OnPriorityEvent( void ){
 	return false;
 }
-void CServer::OnTimer( void )
-{
+void CServer::OnTimer( void ){
 	m_CurTime = time( NULL );
 	if( m_CurTime - m_CheckActiveTime >= 2 ){
 		m_CheckActiveTime = m_CurTime;
@@ -85,8 +79,7 @@ void CServer::OnTimer( void )
 		}
 	}
 }
-void CServer::OnAccept( IConnect* connect )
-{
+void CServer::OnAccept( IConnect* connect ){
 	if( m_bIsInitOK ){
 		try{
 			CServerSocket* client = new CServerSocket( this, connect );
@@ -101,13 +94,11 @@ void CServer::OnAccept( IConnect* connect )
 		connect->Close();
 	}
 }
-void CServer::OnClose( IConnect* nocallbackconnect, bool bactive )
-{
+void CServer::OnClose( IConnect* nocallbackconnect, bool bactive ){
 	DebugInfo("CServer::OnClose NoCallBack Connect");
 	DealCloseSocket( nocallbackconnect );
 }
-void CServer::DealCloseSocket( IConnect* connect )
-{
+void CServer::DealCloseSocket( IConnect* connect ){
 	DebugInfo("CServer::DealCloseSocket start connect=%d ClientSize=%d",reinterpret_cast<int>(connect),m_Clients.size());
 
 	MapClientSocket::iterator itorConnect = m_Clients.find( connect );

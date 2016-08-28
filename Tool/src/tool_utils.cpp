@@ -16,6 +16,7 @@ namespace Tool{
 
 		return distribution(generator);
 	}
+
 	int  Random_Int(int nMin, int nMax){
 		static std::default_random_engine generator(time(NULL));
 		static std::uniform_int_distribution<int> distribution(0,INT32_MAX);
@@ -24,6 +25,7 @@ namespace Tool{
 		int nRand = distribution(generator) % std::max<int>((nMax - nMin + 1),1);
 		return (nRand + nMin);
 	}
+
 	bool GetChangce(int nTotalCount,int nIdx){
 		static std::default_random_engine generator(time(NULL));
 		static std::uniform_int_distribution<int> distribution(0,INT32_MAX);
@@ -36,4 +38,5 @@ namespace Tool{
 		}
 		return false;
 	}
+
 }

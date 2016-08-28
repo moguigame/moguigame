@@ -29,10 +29,16 @@ namespace Mogui{
 
 	class CLogThread : public CThread{
 	public:
-		class CLogPacket : public CMemoryPool_Public<CLogPacket, 10>{
+		class CLogPacket : public CMemoryPool_Public<CLogPacket>{
 		public:
 			CLogPacket(){ Reset();}
-			void Reset(){ memset(this,0,sizeof(*this));}
+			void Reset(){
+				level   = 0;
+				type    = 0;
+				len     = 0;
+				logtime = 0;
+				memset(log,0,sizeof(log));
+			}
 
 			unsigned char	level;
 			unsigned char	type;
