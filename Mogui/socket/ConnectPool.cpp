@@ -51,7 +51,7 @@ namespace Mogui
 
 	std::string	GetSocketBaseVersion( void )
 	{
-		return "0.0.0.9";
+		return "1.0.6.8";
 	}
 
 	CConnectPool::CConnectPool( void )
