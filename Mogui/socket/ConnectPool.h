@@ -8,7 +8,7 @@ namespace Mogui
 	class CDispatcher;
 	class CConnect;
 
-	class CConnectPool : public IConnectPool
+	class CConnectPool : public IConnectPool,public boost::noncopyable
 	{
 	public:
 		enum ConnectPoolState{ CPS_NONE=0, CPS_CALLBACK, CPS_START };

@@ -44,7 +44,7 @@ namespace Mogui
 		//}
 	};
 
-	class CConnect : public IConnect, public CMemoryPool_Public<CConnect, 1>
+	class CConnect : public IConnect, public boost::noncopyable,public CMemoryPool_Public<CConnect, 1>
 	{
 	public:
 		enum SocketType
@@ -128,9 +128,6 @@ namespace Mogui
 
 		std::string		m_stringip;
 		long			m_longip;
-	private:
-		CConnect( const CConnect& );
-		CConnect& operator= ( const CConnect& );
 	};
 
 	typedef boost::shared_ptr< CConnect > PtrConnect ;

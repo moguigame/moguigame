@@ -140,6 +140,60 @@ namespace Mogui
 		return (std::string)szaddr;
 	};
 
+	BOOL CallFuncAcceptEx(
+		IN SOCKET sListenSocket,
+		IN SOCKET sAcceptSocket,
+		IN PVOID lpOutputBuffer,
+		IN DWORD dwReceiveDataLength,
+		IN DWORD dwLocalAddressLength,
+		IN DWORD dwRemoteAddressLength,
+		OUT LPDWORD lpdwBytesReceived,
+		IN LPOVERLAPPED lpOverlapped
+		)
+	{
+		static LPFN_ACCEPTEX    pFuncAcceptEX = NULL;
+		if ( pFuncAcceptEX == NULL ){
+			GUID             GuidAcceptEX  = WSAID_ACCEPTEX;
+			DWORD            dwBytes;
+			SOCKET TempSocket = ::WSASocket(AF_INET,SOCK_STREAM,IPPROTO_TCP,NULL,0,WSA_FLAG_OVERLAPPED);
+			if ( WSAIoctl(TempSocket,SIO_GET_EXTENSION_FUNCTION_POINTER,&GuidAcceptEX,sizeof(GuidAcceptEX),&pFuncAcceptEX,sizeof(pFuncAcceptEX),&dwBytes,NULL,NULL) )
+			{
+				fprintf(stderr, "Error: WSAIoctl::LPFN_ACCEPTEX 创建失败 err=%d\n", WSAGetLastError() );
+				return false;
+			}
+		}
+		return pFuncAcceptEX(sListenSocket,sAcceptSocket,lpOutputBuffer,dwReceiveDataLength,dwLocalAddressLength,dwRemoteAddressLength,lpdwBytesReceived,lpOverlapped);
+	}
+
+
+	void CallGetAcceptExSockaddrs(
+		_In_ PVOID lpOutputBuffer,
+		_In_ DWORD dwReceiveDataLength,
+		_In_ DWORD dwLocalAddressLength,
+		_In_ DWORD dwRemoteAddressLength,
+		_Out_ LPSOCKADDR *LocalSockaddr,
+		_Out_ LPINT LocalSockaddrLength,
+		_Out_ LPSOCKADDR *RemoteSockaddr,
+		_Out_ LPINT RemoteSockaddrLength
+		)
+	{
+		static LPFN_GETACCEPTEXSOCKADDRS    pFuncGetAcceptExSockAddrs = NULL;
+		if ( pFuncGetAcceptExSockAddrs == NULL ){
+			GUID             GuidAcceptEX  = WSAID_GETACCEPTEXSOCKADDRS;
+			DWORD            dwBytes;
+			SOCKET TempSocket = ::WSASocket(AF_INET,SOCK_STREAM,IPPROTO_TCP,NULL,0,WSA_FLAG_OVERLAPPED);
+			if ( WSAIoctl(TempSocket,SIO_GET_EXTENSION_FUNCTION_POINTER,&GuidAcceptEX,sizeof(GuidAcceptEX),&pFuncGetAcceptExSockAddrs,sizeof(pFuncGetAcceptExSockAddrs),&dwBytes,NULL,NULL) )
+			{
+				fprintf(stderr, "Error: WSAIoctl::LPFN_GETACCEPTEXSOCKADDRS 创建失败 err=%d\n", WSAGetLastError() );
+				return;
+			}
+		}
+		pFuncGetAcceptExSockAddrs(lpOutputBuffer,dwReceiveDataLength,dwLocalAddressLength,dwRemoteAddressLength,LocalSockaddr,LocalSockaddrLength,RemoteSockaddr,RemoteSockaddrLength);
+	}
+
+
+
+
 	CConnect::CConnect( void )
 		: m_dispatcher( 0 ), m_sockettype( ST_UNKNOW ), m_socket( INVALID_SOCKET ), m_callback( 0 )
 		, m_logicused( 0 ), m_status( SS_INVALID ), m_iocpref( 0 ), m_sendused( 0 )
@@ -373,7 +427,7 @@ namespace Mogui
 			packetsave->m_socket   = packet->m_socket;
 			packetsave->m_used	   = packet->m_used;
 			packetsave->m_type	   = packet->m_type;	
-			packetsave->m_callback =packet->m_callback;
+			packetsave->m_callback = packet->m_callback;
 			memcpy(packetsave->m_buffer, packet->m_buffer, packetsave->m_used);
 
 			m_logicpackets_buff.PushPacket( packetsave );
@@ -577,7 +631,7 @@ namespace Mogui
 				sockaddr_in* remaddr = (sockaddr_in*)rembuff; 
 				int locaddrlen = 0, remaddrlen = 0;
 
-				::GetAcceptExSockaddrs(m_recvbuffer, 0, sizeof(sockaddr_in)+16, sizeof(sockaddr_in)+16,	
+				CallGetAcceptExSockaddrs(m_recvbuffer, 0, sizeof(sockaddr_in)+16, sizeof(sockaddr_in)+16,
 					(LPSOCKADDR*)(&locaddr), &locaddrlen, (LPSOCKADDR*)(&remaddr), &remaddrlen);
 				char* szaddr = inet_ntoa(remaddr->sin_addr);
 				if ( szaddr == NULL )
@@ -636,7 +690,7 @@ namespace Mogui
 		m_socket = ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_IP, NULL, 0, WSA_FLAG_OVERLAPPED);
 		if ( m_socket == INVALID_SOCKET )
 		{
-			fprintf(stderr, "Error: CListen::WaitForAccepted 创建socket失败 err=%d\n", GetLastError() ); 
+			fprintf(stderr, "Error: CListen::WaitForAccepted 创建socket失败 err=%d\n", GetLastError() );
 			return false;
 		}
 
@@ -646,7 +700,7 @@ namespace Mogui
 		}
 
 		memset(&m_ol_accept.overlapped, 0, sizeof(m_ol_accept.overlapped));
-		if ( !::AcceptEx( listenfd, m_socket, m_recvbuffer, 0,
+		if ( !CallFuncAcceptEx( listenfd, m_socket, m_recvbuffer, 0,
 			sizeof(sockaddr_in)+16, sizeof(sockaddr_in)+16, NULL, &m_ol_accept.overlapped) )
 		{
 			int nLastError = WSAGetLastError();
