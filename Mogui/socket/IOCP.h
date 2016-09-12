@@ -3,6 +3,8 @@
 #include <Windows.h>
 
 #include <deque>
+#include <queue>
+#include <set>
 #include "boost/utility.hpp"
 
 #include "Lock.h"
@@ -21,10 +23,11 @@ namespace Mogui
 
 		bool Init( CDispatcher* dispatcher, int clientcnt, int connectcnt );
 		void Fini( void );
+
 		CConnect* Connect( const char* ip, unsigned short port, unsigned int recvsize, unsigned int sendsize);
 		bool Listen( unsigned short port, unsigned int recvsize, unsigned int sendsize );
-
 		void Close( CConnect* socket, bool bactive );
+		void OnIOCPDisConnect( CConnect* socket );
 
 		static void CALLBACK IOCP_IO( DWORD dwErrorCode, DWORD dwNumberOfBytesTransferred, LPOVERLAPPED lpOverlapped );
 
@@ -35,10 +38,13 @@ namespace Mogui
 
 		CConnect*             m_listener;
 		std::deque<CConnect*> m_accepts;
-		int                   m_acceptcnt;
+		int                   m_acceptuse;
+
+		std::deque<CConnect*> m_connects;
+		std::set<CConnect*>   m_ConnectInUse;
+		int					  m_connectcnt;
 
 		CLock				  m_lock;
-		CCondition			  m_condition;
-		int					  m_connects;
+		CCondition			  m_condition;		
 	};
 }

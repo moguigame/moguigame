@@ -180,9 +180,8 @@ namespace Mogui
 				packet->m_socket->OnMsg( packet );
 				break;
 			}
-		case CPacket::PT_ACCEPT:
-			{
-				fprintf(stderr, "Info: %-10d CPacket::PT_ACCEPT, %p\n", ::GetTickCount(),packet->m_socket);
+		case CPacket::PT_ACCEPT:			{
+				fprintf(stderr, "Info: %-10d CPacket::PT_ACCEPT, %p ip=%s \n", ::GetTickCount(),packet->m_socket,packet->m_socket->GetPeerStringIp().c_str());
 				m_cpool->OnAccept(  packet->m_socket );
 				break;
 			}

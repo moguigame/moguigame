@@ -12,12 +12,15 @@ namespace Mogui
 {
 	class CConnect;
 	class CDispatcher;
+	class CIOCP;
 
 	enum IOCP_IOTYPE
 	{
 		IOTYPE_RECV = 0,
 		IOTYPE_SEND,
 		IOTYPE_ACCEPT,
+		IOTYPE_CONNECT,
+		IOTYPE_DISCONNECT,
 	};
 
 	struct Ex_OVERLAPPED
@@ -79,6 +82,7 @@ namespace Mogui
 		void OnIOCPRecv( Ex_OVERLAPPED* pexol, int bytes );
 		void OnIOCPSend( Ex_OVERLAPPED* pexol, int bytes );
 		void OnIOCPAccept( Ex_OVERLAPPED* pexol );
+		void OnIOCPConnect( Ex_OVERLAPPED* pexol );
 		void OnIOCPClose( Ex_OVERLAPPED* pexol, DWORD dwErrorCode );
 
 		bool WaitForAccepted( CDispatcher* dispatcher, SOCKET listenfd );
@@ -89,6 +93,7 @@ namespace Mogui
 		int  GetStatus( void ) const;
 		int  GetType( void ) const;
 		void TrueClose( bool bactive );
+		void ReuseClose( CIOCP* pIOCP );
 
 	private:
 		bool ModifySend( CPacketQueue& delpackets );
@@ -107,6 +112,8 @@ namespace Mogui
 		Ex_OVERLAPPED	m_ol_recv;
 		Ex_OVERLAPPED	m_ol_send;
 		Ex_OVERLAPPED	m_ol_accept;
+		Ex_OVERLAPPED	m_ol_connect;
+		Ex_OVERLAPPED	m_ol_disconnect;
 
 		CPacketQueue	m_logicpackets_buff;
 		char			m_logicbuffer[_MAX_LOGIC_BUFFER_LENGTH+_MAX_BUFFER_LENGTH];
@@ -119,6 +126,7 @@ namespace Mogui
 		CPacketQueue	m_closepackets;
 		int				m_iocpref;
 
+		int             m_bindSuccess;
 		char			m_sendbuffer[_MAX_SEND_BUFFER_LENGTH];
 		unsigned short	m_sendused;
 		bool			m_sending;
@@ -128,6 +136,16 @@ namespace Mogui
 
 		std::string		m_stringip;
 		long			m_longip;
+
+		int             m_nAcceptTimes;		
+		int             m_nConnectTimes;
+		int             m_nCloseTimes;
+		int             m_nSendTimes;
+		int             m_nRecvTimes;
+
+		int             m_nOnConnectTimes;
+		int             m_nOnMsgTimes;
+		int             m_nOnCloseTimes;
 	};
 
 	typedef boost::shared_ptr< CConnect > PtrConnect ;

@@ -1,4 +1,5 @@
 #include <time.h>
+#include <cstdint>
 
 #include "Tool.h"
 
@@ -19,7 +20,7 @@ CServer::CServer(void){
 
 	m_pPool = CreateConnectPool();
 	m_pPool->SetCallback( this );
-	m_pPool->Start( 843, 2000, 0);
+	m_pPool->Start( 6000, 30000, 0);
 
 	m_CurTime = time( NULL );
 	m_CheckActiveTime = m_CurTime;
@@ -72,9 +73,9 @@ void CServer::OnTimer( void ){
 	if( m_CurTime - m_CheckActiveTime >= 2 ){
 		m_CheckActiveTime = m_CurTime;
 		for( MapClientSocket::iterator itorClient = m_Clients.begin();itorClient != m_Clients.end();itorClient++ ){
-			CServerSocket* pSocket = itorClient->second;
-			if( m_CurTime - pSocket->GetConnectTime() >= 15 ){
-				pSocket->Close();
+			CServerSocket* pSocket = itorClient->second;			
+			if( pSocket->IsConnected() && m_CurTime - pSocket->GetConnectTime() >= 4 ){
+				//pSocket->Close();
 			}
 		}
 	}
