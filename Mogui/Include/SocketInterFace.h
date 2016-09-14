@@ -48,7 +48,7 @@ namespace Mogui{
 		virtual void Stop( void ) = 0;
 
 		// 连接出去
-		virtual IConnect* Connect(const char* ip, int port) = 0;
+		virtual IConnect* Connect(const char* ip, int port,IConnectCallback* callback) = 0;
 	};
 
 	// IConnectPool 回调

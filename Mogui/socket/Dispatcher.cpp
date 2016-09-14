@@ -2,7 +2,7 @@
 #include "SocketDefine.h"
 
 #include "Dispatcher.h"
-
+#include "IOCP.h"
 #include "ConnectPool.h"
 #include "Connect.h"
 
@@ -86,6 +86,11 @@ namespace Mogui
 		}
 
 		return false;
+	}
+
+	void CDispatcher::SetIOCP( CIOCP* pIOCP ){
+		assert( m_iocp );
+		m_iocp = pIOCP;
 	}
 
 	int CDispatcher::Run( void )
@@ -186,8 +191,8 @@ namespace Mogui
 				break;
 			}
 		case CPacket::PT_CONNECT:
-			{
-				packet->m_socket->OnConnect( packet->m_callback );
+			{				
+				packet->m_socket->OnConnect();
 				break;
 			}
 		case CPacket::PT_CLOSE_ACTIVE:
@@ -210,6 +215,11 @@ namespace Mogui
 
 				break;
 			}
+		case CPacket::PT_SOCKET_REUSE:
+			{	
+				m_iocp->OnIOCPDisConnect(packet->m_socket);				
+				break;
+			}			
 		default:
 			break;
 		}

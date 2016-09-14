@@ -24,7 +24,7 @@ namespace Mogui
 		bool Init( CDispatcher* dispatcher, int clientcnt, int connectcnt );
 		void Fini( void );
 
-		CConnect* Connect( const char* ip, unsigned short port, unsigned int recvsize, unsigned int sendsize);
+		CConnect* Connect( const char* ip, unsigned short port, IConnectCallback* callback, unsigned int recvsize, unsigned int sendsize);
 		bool Listen( unsigned short port, unsigned int recvsize, unsigned int sendsize );
 		void Close( CConnect* socket, bool bactive );
 		void OnIOCPDisConnect( CConnect* socket );
@@ -42,7 +42,6 @@ namespace Mogui
 
 		std::deque<CConnect*> m_connects;
 		std::set<CConnect*>   m_ConnectInUse;
-		int					  m_connectcnt;
 
 		CLock				  m_lock;
 		CCondition			  m_condition;		

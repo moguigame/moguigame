@@ -11,7 +11,6 @@ CServerSocket::CServerSocket( CServer* pServer, IConnect* pConnect ){
 	assert(pConnect);
 	m_pServer  = pServer;
 	m_pConnect = pConnect;
-	m_pConnect->SetCallback(this);
 
 	m_ConnectTime = 0;
 	m_SocketState = SOCKET_ST_NONE;
@@ -41,6 +40,5 @@ int CServerSocket::OnMsg( const char* buf, int len ){
 	return len;
 }
 void CServerSocket::OnClose( bool bactive ){
-	m_SocketState = SOCKET_ST_CONNECTED;
-	m_pServer->DealCloseSocket( m_pConnect );
+	m_SocketState = SOCKET_ST_CLOSED;
 }

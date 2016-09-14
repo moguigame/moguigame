@@ -32,7 +32,7 @@ namespace Mogui
 		virtual void Stop( void );
 
 		// 连接出去
-		virtual IConnect* Connect(const char* ip, int port);
+		virtual IConnect* Connect(const char* ip, int port,IConnectCallback* callback);
 
 		// 优先事件，返回true，表示存在优先事件
 		virtual bool OnPriorityEvent( void );

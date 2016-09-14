@@ -4,7 +4,7 @@
 #include "Tool.h"
 
 #include "Server.h"
-#include "ServerSocket.h"
+#include "ClientSocket.h"
 
 using namespace std;
 using namespace Mogui;
@@ -20,20 +20,21 @@ CServer::CServer(void){
 
 	m_pPool = CreateConnectPool();
 	m_pPool->SetCallback( this );
-	m_pPool->Start( 6000, 10, 0);
+	m_pPool->Start( 0, 0, 1000);
 
 	m_CurTime = time( NULL );
 	m_CheckActiveTime = m_CurTime;
 
+	m_vecConnects.resize(20000);
+	for (int nCount=0;nCount<m_vecConnects.size();++nCount){
+		m_vecConnects[nCount] = new CClientSocket(this);
+	}
+
 	m_bIsInitOK = true;
 }
 CServer::~CServer(void){
-	MapClientSocket::iterator itorClient;
-	for(itorClient=m_Clients.begin();itorClient!=m_Clients.end();++itorClient){
-		if( itorClient->first ){
-			itorClient->first->Close();
-		}
-		safe_delete(itorClient->second);
+	for (int nCount=0;nCount<m_vecConnects.size();++nCount){
+		m_vecConnects[nCount]->Close();
 	}
 
 	m_pPool->Stop( );
@@ -69,15 +70,20 @@ bool CServer::OnPriorityEvent( void ){
 	return false;
 }
 void CServer::OnTimer( void ){
+	if ( !m_bIsInitOK ){
+		return ;
+	}
 	m_CurTime = time( NULL );
-	if( m_CurTime - m_CheckActiveTime >= 1 ){
+	if( m_CurTime - m_CheckActiveTime >= 2 ){
 		m_CheckActiveTime = m_CurTime;
-		for( MapClientSocket::iterator itorClient = m_Clients.begin();itorClient != m_Clients.end();itorClient++ ){
-			CServerSocket* pSocket = itorClient->second;			
-			if( pSocket->IsConnected() ){
-				if ( int(pSocket)%10 == m_CurTime%10 ){
-					pSocket->Close();
-				}		
+		for (int nCount=0;nCount<m_vecConnects.size();++nCount){
+			CClientSocket* pClient = m_vecConnects[nCount];
+			int SocketStatus = pClient->GetSocketStatus();
+			if ( SocketStatus==CClientSocket::SOCKET_ST_CLOSED || SocketStatus==CClientSocket::SOCKET_ST_NONE ){
+				pClient->Connect("192.168.2.146",3001);
+			}
+			else if ( Tool::GetChangce(10,1) && SocketStatus==CClientSocket::SOCKET_ST_CONNECTED ){
+				pClient->Close();
 			}
 		}
 	}
@@ -85,10 +91,7 @@ void CServer::OnTimer( void ){
 void CServer::OnAccept( IConnect* connect ){
 	if( m_bIsInitOK ){
 		try{
-			CServerSocket* client = new CServerSocket( this, connect );
-			connect->SetCallback(client);
-			m_Clients.insert( make_pair(connect, client) );
-			DebugInfo("CServer::OnAccept connect=%p ClientSize=%d",connect,m_Clients.size() );
+			DebugInfo("CServer::OnAccept connect=%p",connect );
 		}
 		catch (...)	{
 			DebugError("CServer::OnAccept Out Memory");
@@ -100,23 +103,13 @@ void CServer::OnAccept( IConnect* connect ){
 }
 
 void CServer::OnClose( IConnect* nocallbackconnect, bool bactive ){
-	//DebugInfo("CServer::DealCloseSocket start connect=%p ClientSize=%d",connect,m_Clients.size());
-
-	MapClientSocket::iterator itorConnect = m_Clients.find( connect );
-	if ( itorConnect != m_Clients.end() ){
-		if( itorConnect->second ){
-			safe_delete(itorConnect->second);
-		}
-		m_Clients.erase( itorConnect );
-	}
-	else{
-		DebugError("CServer::DealCloseSocket Can't Find In Client connect=%p ClientSize=%d",connect,m_Clients.size());
-	}
-	//DebugInfo("CServer::DealCloseSocket Left ClientSize=%d",m_Clients.size() );
-
-	DebugInfo("CServer::DealCloseSocket connect=%p ClientSize=%d",connect,m_Clients.size());
+	DebugInfo("CServer::OnClose NoCallBack Connect");
 }
 
-void CServer::DealCloseSocket( IConnect* connect ){
-	assert(0);
+Mogui::IConnect* CServer::Connect(const char* strIP,int nPort,Mogui::IConnectCallback* callback){
+	Mogui::IConnect* pRetConnect = m_pPool->Connect(strIP,nPort,callback);
+	if ( !pRetConnect ){
+		DebugError("CServer::Connect ERROR ");
+	}
+	return pRetConnect;
 }

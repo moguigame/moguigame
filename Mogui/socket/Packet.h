@@ -15,6 +15,7 @@ namespace Mogui{
 			PT_CONNECT,
 			PT_CLOSE_ACTIVE,
 			PT_CLOSE_PASSIVE,
+			PT_SOCKET_REUSE,
 		};
 
 		CPacket( void ) : m_next( 0 ), m_socket( 0 ), m_used( 0 ), m_type( 0 )

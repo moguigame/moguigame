@@ -10,6 +10,7 @@ namespace Mogui
 {
 	class CConnect;
 	class CConnectPool;
+	class CIOCP;
 
 	class CDispatcher : public CThread
 	{
@@ -26,6 +27,7 @@ namespace Mogui
 		void AddForbidIP( const char* ip );
 		void DelForbidIP( const char* ip );
 		bool IsForbidIP( const std::string& ip );
+		void SetIOCP( CIOCP* m_iocp );
 
 	protected:
 		virtual int Run( void );
@@ -37,6 +39,7 @@ namespace Mogui
 
 	private:
 		CConnectPool*	            m_cpool;
+		CIOCP*					    m_iocp;
 
 		CLock			            m_packetlock;
 		CPacketQueue	            m_packets;

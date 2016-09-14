@@ -6,22 +6,23 @@
 #include "boost/utility.hpp"
 
 class CServer;
-class CServerSocket : public Mogui::IConnectCallback, public boost::noncopyable
+class CClientSocket : public Mogui::IConnectCallback, public boost::noncopyable
 {
 public:
 	enum { SOCKET_ST_NONE,SOCKET_ST_CONNECTING,SOCKET_ST_CONNECTED,SOCKET_ST_CLOSING,SOCKET_ST_CLOSED };
 
-	CServerSocket(CServer* server, Mogui::IConnect* pConnect);
-	virtual ~CServerSocket(void);
+	CClientSocket(CServer* server);
+	virtual ~CClientSocket(void);
 
 	virtual void             OnConnect( void );
 	virtual void             OnClose( bool bactive );
 	virtual int              OnMsg( const char* buf, int len );
 
 	void                     Close();
+	void                     Connect(const char* strIP,int nPort);
 
 	bool                     IsConnected() const { return m_SocketState == SOCKET_ST_CONNECTED; }
-	int                      CheckFlash( const char* buf, int len );
+	int                      GetSocketStatus()const{ return m_SocketState; }
 	Mogui::IConnect*         GetConnect(){ return m_pConnect; }
 	time_t                   GetConnectTime()const{return m_ConnectTime;}
 
@@ -30,4 +31,7 @@ protected:
 	Mogui::IConnect* m_pConnect;	
 	int			     m_SocketState;
 	time_t           m_ConnectTime;
+
+	std::string      m_strIP;
+	int              m_nPort;
 };

@@ -104,6 +104,7 @@ namespace Mogui
 			return false;
 		}
 
+		m_dispatcher->SetIOCP(m_iocp);
 		if ( port>0 && !m_iocp->Listen( port, _DEFAULT_RECV_BUFF, _DEFAULT_SEND_BUFF ) )
 		{
 			fprintf(stderr, "Error: IOCP Listen Port=%d",port);
@@ -139,17 +140,19 @@ namespace Mogui
 		}
 	}
 
-	IConnect* CConnectPool::Connect(const char* ip, int port)
+	IConnect* CConnectPool::Connect(const char* ip, int port,IConnectCallback* callback )
 	{
 		CSelfLock l( m_poolLock );
 
-		if ( m_status != CPS_START )
-		{
+		if ( m_status != CPS_START ){
 			fprintf(stderr, "Error: Status Error Can't Connect...");
 			return 0;
 		}
+		if ( !callback ){
+			return 0;
+		}
 
-		return m_iocp->Connect( ip, port, _DEFAULT_RECV_BUFF, _DEFAULT_SEND_BUFF );
+		return m_iocp->Connect( ip, port, callback, _DEFAULT_RECV_BUFF, _DEFAULT_SEND_BUFF );
 	}
 
 	bool CConnectPool::OnPriorityEvent( void )
@@ -169,11 +172,9 @@ namespace Mogui
 
 	void CConnectPool::OnClose( CConnect* connect, bool bactive, bool nocallback )
 	{
-		if ( nocallback )
-		{
+		//if ( nocallback ){
 			m_callback->OnClose(connect, bactive);
-		}
-
+		//}
 		m_iocp->Close( connect, bactive );
 	}
 
