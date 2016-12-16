@@ -4,8 +4,14 @@
 
 namespace Mogui
 {
+	extern void Mogui_InitLogger(const char* prefix, int level);
+	extern void Mogui_FiniLogger(void);
+	extern void Mogui_Log( char* szstr, ...);
+	extern void Mogui_Debug( char* szstr, ...);
+	extern void Mogui_Error( char* szstr, ...);
+
 	CIOCP::CIOCP( void ) : m_dispatcher( 0 ), m_max_clientcnt( 0 ), m_max_connectcnt( 0 )
-		,m_listener( 0 ), m_acceptuse( 0 ){
+		,m_listener( 0 ) {
 	}
 
 	CIOCP::~CIOCP( void ){
@@ -27,6 +33,12 @@ namespace Mogui
 		CSelfLock l( m_lock );
 		
 		for ( std::deque<CConnect*>::iterator it=m_accepts.begin(); it!=m_accepts.end(); ++it ){
+			(*it)->TrueClose( true );
+		}
+		for ( std::set<CConnect*>::iterator it=m_acceptListen.begin(); it!=m_acceptListen.end(); ++it ){
+			(*it)->TrueClose( true );
+		}
+		for ( std::set<CConnect*>::iterator it=m_acceptInUse.begin(); it!=m_acceptInUse.end(); ++it ){
 			(*it)->TrueClose( true );
 		}
 		for ( std::deque<CConnect*>::iterator it=m_connects.begin(); it!=m_connects.end(); ++it ){
@@ -52,6 +64,16 @@ namespace Mogui
 		}
 		m_accepts.clear();
 
+		for ( std::set<CConnect*>::iterator it=m_acceptListen.begin(); it!=m_acceptListen.end(); ++it ){
+			safe_delete(*it);
+		}
+		m_acceptListen.clear();
+
+		for ( std::set<CConnect*>::iterator it=m_acceptInUse.begin(); it!=m_acceptInUse.end(); ++it ){
+			safe_delete(*it);
+		}
+		m_acceptInUse.clear();
+
 		for ( std::deque<CConnect*>::iterator it=m_connects.begin(); it!=m_connects.end(); ++it ){
 			safe_delete(*it);
 		}
@@ -70,8 +92,8 @@ namespace Mogui
 
 		CSelfLock l( m_lock );
 
-		static int s_newConnect = 0;
-		if ( m_connects.size() < m_max_connectcnt ){
+		static long s_newConnect = 0;
+		if ( int(m_connects.size()) < m_max_connectcnt ){
 			for (int nCount=0;nCount<m_max_connectcnt;++nCount){
 				CConnect* socket = new CConnect( );
 				if ( socket ){
@@ -80,25 +102,27 @@ namespace Mogui
 				}
 			}
 			fprintf(stdout, "Connect: Create CConnect Times=%d Connects=%d UseConnect=%d\n",s_newConnect,m_connects.size(),m_ConnectInUse.size());
+			Mogui_Log("Connect: Create CConnect Times=%d Connects=%d UseConnect=%d ",s_newConnect,m_connects.size(),m_ConnectInUse.size());
 		}
 
 		if ( m_connects.size() ){
 			CConnect* socket = m_connects.front();
 			m_connects.pop_front();
 			if ( socket ){
+				assert(socket->GetIoRef()==0);
 				socket->SetCallback(callback);
 				if ( socket->Connect( m_dispatcher, ip, port, recvsize, sendsize ) ){
 					assert(m_ConnectInUse.find(socket)==m_ConnectInUse.end());
 					m_ConnectInUse.insert(socket);
 
-					fprintf(stdout, "Connect::CConnect NewTimes=%d Connects=%d UseConnect=%d\n",s_newConnect,m_connects.size(),m_ConnectInUse.size());
+					//fprintf(stdout, "Connect::CConnect NewTimes=%d Connects=%d UseConnect=%d\n",s_newConnect,m_connects.size(),m_ConnectInUse.size());
+					Mogui_Log("Connect::CConnect NewTimes=%d Connects=%d UseConnect=%d ",s_newConnect,m_connects.size(),m_ConnectInUse.size());
 
 					return socket;
 				}
 			}
 			safe_delete(socket);
-		}
-		
+		}		
 		return 0;
 	}
 
@@ -122,25 +146,29 @@ namespace Mogui
 
 		for ( int i=0; i<m_max_clientcnt; ++i ){
 			CConnect* socket = new CConnect( );
-			if ( !socket ){
-				fprintf(stderr, "Error: CIOCP::Listen new CConnect failed iCount=%d\n",i);
-				continue;
+			if ( socket ){
+				m_accepts.push_back(socket);
 			}
+		}
+		for ( int i=0; i<m_max_clientcnt*2; ++i ){
+			CConnect* socket = new CConnect( );
 			if( socket && socket->WaitForAccepted( m_dispatcher, m_listener->GetSocket() ) ){
-				m_accepts.push_back( socket );
+				m_acceptListen.insert( socket );
 			}
 			else{
 				safe_delete(socket);
 			}
 		}
-		m_acceptuse = 0;
 
-		fprintf(stderr, "MaxConnect=%d CurConnect=%d \n",m_max_clientcnt,(int)m_accepts.size());
+		Mogui_Log("CIOCP::Listen accepts=%d acceptListen=%d acceptInUse=%d",m_accepts.size(),m_acceptListen.size(),m_acceptInUse.size() );
+		fprintf(stdout, "CIOCP::Listen accepts=%d acceptListen=%d acceptInUse=%d",m_accepts.size(),m_acceptListen.size(),m_acceptInUse.size() );
 
 		return true;
 	}
 
 	void CIOCP::Close( CConnect* socket, bool bactive ){
+		Mogui_Debug("CIOCP::Close Connect=%p Active=%d",socket,bactive);
+
 		int sockettype = socket->GetType();
 		if ( sockettype==CConnect::ST_CONNECTTO || sockettype==CConnect::ST_ACCEPTED ){
 			bool bRetClose = socket->ReuseClose( this );
@@ -157,9 +185,12 @@ namespace Mogui
 	void CIOCP::OnIOCPDisConnect( CConnect* socket ){
 		CSelfLock l( m_lock );
 
-		fprintf(stdout, "Ticket=%d CIOCP::OnIOCPDisConnect Connect=%p \n", GetTickCount(),socket );
-
 		int sockettype = socket->GetType();
+
+		int nIORef = socket->GetIoRef();
+		Mogui_Debug("CIOCP::OnIOCPDisConnect Connect=%p Type=%d IoRef=%d",socket,sockettype,nIORef );
+		assert(nIORef ==0);
+		
 		if ( sockettype==CConnect::ST_CONNECTTO ){
 			assert(m_ConnectInUse.find(socket)!=m_ConnectInUse.end());
 			m_ConnectInUse.erase(socket);
@@ -168,19 +199,58 @@ namespace Mogui
 			m_connects.push_back(socket);
 		}
 		else if ( sockettype==CConnect::ST_ACCEPTED ){
-			if( m_listener ){
-				bool bWaitAccept = socket->WaitForAccepted( m_dispatcher, m_listener->GetSocket() );
-				if ( !bWaitAccept ){
-					safe_delete(socket);
+			assert(m_acceptInUse.find(socket)!=m_acceptInUse.end());
+			m_acceptInUse.erase(socket);
 
-					std::deque<CConnect*>::iterator itorFind = std::find(m_accepts.begin(),m_accepts.end(),socket);
-					assert(itorFind != m_accepts.end());
-					m_accepts.erase(itorFind);
-				}
-			}
+			assert(std::find(m_accepts.begin(),m_accepts.end(),socket) == m_accepts.end());
+			m_accepts.push_back(socket);
+
+			//if( m_listener ){
+			//	bool bWaitAccept = socket->WaitForAccepted( m_dispatcher, m_listener->GetSocket() );
+			//	if ( !bWaitAccept ){
+			//		safe_delete(socket);
+
+			//		std::deque<CConnect*>::iterator itorFind = std::find(m_accepts.begin(),m_accepts.end(),socket);
+			//		assert(itorFind != m_accepts.end());
+			//		m_accepts.erase(itorFind);
+			//	}
+			//}
 		}
 		else{
 			assert(0);
+		}
+	}
+
+	void CIOCP::OnIOAccept( CConnect* socket ){
+		assert( socket->GetType() == CConnect::ST_ACCEPTED );
+		if ( socket->GetType() == CConnect::ST_ACCEPTED ){
+			assert( m_acceptListen.find(socket) != m_acceptListen.end() );
+			m_acceptListen.erase(socket);
+
+			assert( m_acceptInUse.find(socket) == m_acceptInUse.end() );
+			m_acceptInUse.insert(socket);
+
+			if ( m_acceptListen.size() < m_max_clientcnt ){
+				while ( m_accepts.size() ){
+					CConnect* pAccept = m_accepts.front();
+					m_accepts.pop_front();
+					if ( pAccept && pAccept->WaitForAccepted( m_dispatcher, m_listener->GetSocket() ) ){
+						m_acceptListen.insert(pAccept);
+					}
+					else{
+						safe_delete(pAccept);
+					}
+				}
+				assert(m_accepts.size()==0);
+				for (int nCount=0;nCount<m_max_clientcnt;++nCount ){
+					CConnect* pAccept = new CConnect( );
+					if ( pAccept ){
+						m_accepts.push_back(pAccept);
+					}
+				}
+				Mogui_Log("CIOCP::OnIOAccept m_accepts=%d m_acceptListen=%d m_acceptInUse=%d",m_accepts.size(),m_acceptListen.size(),m_acceptInUse.size() );
+				fprintf(stdout, "CIOCP::OnIOAccept m_accepts=%d m_acceptListen=%d m_acceptInUse=%d",m_accepts.size(),m_acceptListen.size(),m_acceptInUse.size() );
+			}
 		}
 	}
 
@@ -193,7 +263,30 @@ namespace Mogui
 		IOCP_IOTYPE io_type = eol->iotype;
 		CConnect*	socket  = eol->socket;
 
-		fprintf( stdout, "Ticket=%d CIOCP::IOCP_IO type=%d bytes=%d error=%d connect=%p \n", GetTickCount(),io_type, dwNumberOfBytesTransferred, dwErrorCode/*errno*/,socket );
+		if( io_type == IOTYPE_RECV ){
+			socket->m_nIoRecv--;
+			assert(socket->m_nIoRecv == 0);
+		}
+		else if( io_type == IOTYPE_SEND ){
+			socket->m_nIoSend--;
+			assert(socket->m_nIoSend == 0);
+		}
+		else if( io_type ==IOTYPE_ACCEPT ){
+			socket->m_nIoAccept--;
+			assert(socket->m_nIoAccept == 0);
+		}
+		else if( io_type == IOTYPE_CONNECT ){
+			socket->m_nIoConnect--;
+			assert(socket->m_nIoConnect == 0);
+		}
+		else if( io_type == IOTYPE_DISCONNECT ){
+			socket->m_nIoDisconnect--;
+			assert(socket->m_nIoDisconnect == 0);
+		}
+		else{ assert(0); }
+
+		//fprintf( stdout, "Ticket=%d CIOCP::IOCP_IO type=%d bytes=%d error=%d connect=%p \n", GetTickCount(),io_type, dwNumberOfBytesTransferred, dwErrorCode/*errno*/,socket );
+		Mogui_Debug("CIOCP::IOCP_IO connect=%p type=%d bytes=%d error=%d IoRef=%d \n", socket,io_type, dwNumberOfBytesTransferred, dwErrorCode,socket->GetIoRef() );
 
 		if ( 0 == socket ) return;
 
@@ -236,8 +329,6 @@ namespace Mogui
 				case IOTYPE_DISCONNECT:
 					{
 						socket->OnIODisConnect( eol );
-						//CIOCP* pIOCP = (CIOCP*)(eol->flags);
-						//pIOCP->OnIOCPDisConnect( eol->socket );				
 					}
 					break;
 				}							
@@ -249,6 +340,6 @@ namespace Mogui
 		}
 
 		int IoTimes = socket->GetIoRef();
-		assert( IoTimes>=0 && IoTimes<=5 );
+		assert( IoTimes>=0 && IoTimes<=3 );
 	}
 }

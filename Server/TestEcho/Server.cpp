@@ -20,7 +20,7 @@ CServer::CServer(void){
 
 	m_pPool = CreateConnectPool();
 	m_pPool->SetCallback( this );
-	m_pPool->Start( 6000, 10, 0);
+	m_pPool->Start( 6000, 10000, 0);
 
 	m_CurTime = time( NULL );
 	m_CheckActiveTime = m_CurTime;
@@ -76,7 +76,7 @@ void CServer::OnTimer( void ){
 			CServerSocket* pSocket = itorClient->second;			
 			if( pSocket->IsConnected() ){
 				if ( int(pSocket)%10 == m_CurTime%10 ){
-					pSocket->Close();
+					//pSocket->Close();
 				}		
 			}
 		}
@@ -99,10 +99,10 @@ void CServer::OnAccept( IConnect* connect ){
 	}
 }
 
-void CServer::OnClose( IConnect* nocallbackconnect, bool bactive ){
+void CServer::OnClose( IConnect* pCconnect, bool bactive ){
 	//DebugInfo("CServer::DealCloseSocket start connect=%p ClientSize=%d",connect,m_Clients.size());
 
-	MapClientSocket::iterator itorConnect = m_Clients.find( connect );
+	MapClientSocket::iterator itorConnect = m_Clients.find( pCconnect );
 	if ( itorConnect != m_Clients.end() ){
 		if( itorConnect->second ){
 			safe_delete(itorConnect->second);
@@ -110,11 +110,11 @@ void CServer::OnClose( IConnect* nocallbackconnect, bool bactive ){
 		m_Clients.erase( itorConnect );
 	}
 	else{
-		DebugError("CServer::DealCloseSocket Can't Find In Client connect=%p ClientSize=%d",connect,m_Clients.size());
+		DebugError("CServer::DealCloseSocket Can't Find In Client connect=%p ClientSize=%d",pCconnect,m_Clients.size());
 	}
 	//DebugInfo("CServer::DealCloseSocket Left ClientSize=%d",m_Clients.size() );
 
-	DebugInfo("CServer::DealCloseSocket connect=%p ClientSize=%d",connect,m_Clients.size());
+	DebugInfo("CServer::DealCloseSocket connect=%p ClientSize=%d",pCconnect,m_Clients.size());
 }
 
 void CServer::DealCloseSocket( IConnect* connect ){

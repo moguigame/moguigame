@@ -89,6 +89,61 @@ namespace Mogui{
 			m_init = false;
 		}
 
+		void Log_Text(int level, const char * str) {
+			if (!IsHaveInit()) {
+				return;
+			}
+			if (!IsLevelLog(level)) {
+				return;
+			}
+
+			int pos = 0;
+			int leftlen = (int)strlen(str);
+			while (leftlen > 0) {
+				CLogThread::CLogPacket* packet = new CLogThread::CLogPacket();
+
+				packet->level = level;
+				packet->type = 0;
+				if (leftlen>MAX_LOG_LEN) {
+					memcpy(packet->log, str + pos, MAX_LOG_LEN);
+					packet->len = MAX_LOG_LEN;
+				}
+				else {
+					memcpy(packet->log, str + pos, leftlen);
+					packet->len = leftlen;
+				}
+				packet->log[packet->len] = 0;
+				leftlen -= packet->len;
+				pos += packet->len;
+
+				PostLog(packet);
+			}
+		}
+
+		void Log_Text_Format(int level, char* szstr, ...) {
+			if (!IsHaveInit()) {
+				return;
+			}
+			if (!IsLevelLog(level)) {
+				return;
+			}
+
+			CLogThread::CLogPacket* packet = new CLogThread::CLogPacket();
+
+			packet->level = level;
+			packet->type = 0;
+
+			va_list args;
+			va_start(args, szstr);
+			packet->len = _vsnprintf_s(packet->log, MAX_LOG_LEN, sizeof(packet->log) - 1, szstr, args);
+			va_end(args);
+			packet->log[packet->len] = 0;
+
+			PostLog(packet);
+		}
+
+
+
 		bool IsHaveInit(){
 			return m_init;
 		}
@@ -322,5 +377,80 @@ namespace Mogui{
 		packet->log[packet->len] = 0;
 
 		g_logthread.PostLog( packet );
+	}
+
+	static CLogThread g_mogui_logthread;
+	void Mogui_InitLogger(const char* prefix, int level) {
+		g_mogui_logthread.Init(prefix, level);
+	}
+
+	void Mogui_FiniLogger(void) {
+		g_mogui_logthread.Fini();
+	}
+
+	void Mogui_Log( char* szstr, ...) {
+		if (!g_mogui_logthread.IsHaveInit()) {
+			return;
+		}
+		if (!g_mogui_logthread.IsLevelLog(LOGLEVEL_INFO)) {
+			return;
+		}
+
+		CLogThread::CLogPacket* packet = new CLogThread::CLogPacket();
+
+		packet->level = LOGLEVEL_INFO;
+		packet->type = 0;
+
+		va_list args;
+		va_start(args, szstr);
+		packet->len = _vsnprintf_s(packet->log, MAX_LOG_LEN, sizeof(packet->log) - 1, szstr, args);
+		va_end(args);
+		packet->log[packet->len] = 0;
+
+		g_mogui_logthread.PostLog(packet);
+	}
+
+	void Mogui_Debug( char* szstr, ...) {
+		if (!g_mogui_logthread.IsHaveInit()) {
+			return;
+		}
+		if (!g_mogui_logthread.IsLevelLog(LOGLEVEL_DEBUG)) {
+			return;
+		}
+
+		CLogThread::CLogPacket* packet = new CLogThread::CLogPacket();
+
+		packet->level = LOGLEVEL_DEBUG;
+		packet->type = 0;
+
+		va_list args;
+		va_start(args, szstr);
+		packet->len = _vsnprintf_s(packet->log, MAX_LOG_LEN, sizeof(packet->log) - 1, szstr, args);
+		va_end(args);
+		packet->log[packet->len] = 0;
+
+		g_mogui_logthread.PostLog(packet);
+	}
+
+	void Mogui_Error( char* szstr, ...) {
+		if (!g_mogui_logthread.IsHaveInit()) {
+			return;
+		}
+		if (!g_mogui_logthread.IsLevelLog(LOGLEVEL_ERROR)) {
+			return;
+		}
+
+		CLogThread::CLogPacket* packet = new CLogThread::CLogPacket();
+
+		packet->level = LOGLEVEL_ERROR;
+		packet->type = 0;
+
+		va_list args;
+		va_start(args, szstr);
+		packet->len = _vsnprintf_s(packet->log, MAX_LOG_LEN, sizeof(packet->log) - 1, szstr, args);
+		va_end(args);
+		packet->log[packet->len] = 0;
+
+		g_mogui_logthread.PostLog(packet);
 	}
 }

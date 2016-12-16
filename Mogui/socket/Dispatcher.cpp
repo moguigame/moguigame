@@ -188,10 +188,11 @@ namespace Mogui
 		case CPacket::PT_ACCEPT:			{
 				fprintf(stderr, "Info: %-10d CPacket::PT_ACCEPT, %p ip=%s \n", ::GetTickCount(),packet->m_socket,packet->m_socket->GetPeerStringIp().c_str());
 				m_cpool->OnAccept(  packet->m_socket );
+				m_iocp->OnIOAccept( packet->m_socket );
 				break;
 			}
 		case CPacket::PT_CONNECT:
-			{				
+			{
 				packet->m_socket->OnConnect();
 				break;
 			}
@@ -201,7 +202,7 @@ namespace Mogui
 
 				m_cpool->OnClose(packet->m_socket, true, bnocallback);
 
-				fprintf(stderr, "Info: %-10d CDispatcher::OnPacket delete socket active %p\n", ::GetTickCount(),packet->m_socket);
+				fprintf(stderr, "Info:CDispatcher::OnPacket delete socket active %p\n", ::GetTickCount(),packet->m_socket);
 
 				break;
 			}
@@ -211,13 +212,13 @@ namespace Mogui
 
 				m_cpool->OnClose(packet->m_socket, false, bnocallback);
 
-				fprintf(stderr, "Info: %-10d CDispatcher::OnPacket delete socket passtive %p\n", ::GetTickCount(),packet->m_socket);
+				fprintf(stderr, "Info:CDispatcher::OnPacket delete socket passtive %p\n", ::GetTickCount(),packet->m_socket);
 
 				break;
 			}
 		case CPacket::PT_SOCKET_REUSE:
 			{	
-				m_iocp->OnIOCPDisConnect(packet->m_socket);				
+				m_iocp->OnIOCPDisConnect(packet->m_socket);
 				break;
 			}			
 		default:

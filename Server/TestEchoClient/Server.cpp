@@ -20,12 +20,12 @@ CServer::CServer(void){
 
 	m_pPool = CreateConnectPool();
 	m_pPool->SetCallback( this );
-	m_pPool->Start( 0, 0, 1000);
+	m_pPool->Start( 0, 0, 10000);
 
 	m_CurTime = time( NULL );
 	m_CheckActiveTime = m_CurTime;
 
-	m_vecConnects.resize(20000);
+	m_vecConnects.resize(10000);
 	for (int nCount=0;nCount<m_vecConnects.size();++nCount){
 		m_vecConnects[nCount] = new CClientSocket(this);
 	}
@@ -74,15 +74,15 @@ void CServer::OnTimer( void ){
 		return ;
 	}
 	m_CurTime = time( NULL );
-	if( m_CurTime - m_CheckActiveTime >= 2 ){
+	if( m_CurTime - m_CheckActiveTime >= 20 ){
 		m_CheckActiveTime = m_CurTime;
 		for (int nCount=0;nCount<m_vecConnects.size();++nCount){
 			CClientSocket* pClient = m_vecConnects[nCount];
 			int SocketStatus = pClient->GetSocketStatus();
 			if ( SocketStatus==CClientSocket::SOCKET_ST_CLOSED || SocketStatus==CClientSocket::SOCKET_ST_NONE ){
-				pClient->Connect("192.168.2.146",3001);
+				pClient->Connect("192.168.2.166",6000);
 			}
-			else if ( Tool::GetChangce(10,1) && SocketStatus==CClientSocket::SOCKET_ST_CONNECTED ){
+			else if ( Tool::GetChangce(10,10) && SocketStatus==CClientSocket::SOCKET_ST_CONNECTED ){
 				pClient->Close();
 			}
 		}
@@ -103,7 +103,7 @@ void CServer::OnAccept( IConnect* connect ){
 }
 
 void CServer::OnClose( IConnect* nocallbackconnect, bool bactive ){
-	DebugInfo("CServer::OnClose NoCallBack Connect");
+	//DebugInfo("CServer::OnClose NoCallBack Connect");
 }
 
 Mogui::IConnect* CServer::Connect(const char* strIP,int nPort,Mogui::IConnectCallback* callback){

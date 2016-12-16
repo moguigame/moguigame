@@ -131,7 +131,7 @@ namespace Mogui
 
 		CLock			m_lock;
 		volatile int	m_status;
-		CPacketQueue	m_connectpackets;
+		//CPacketQueue	m_connectpackets;
 		CPacketQueue	m_sendpackets;
 		CPacketQueue	m_closepackets;
 		int				m_iocpref;
@@ -148,6 +148,9 @@ namespace Mogui
 		std::string		m_stringip;
 		long			m_longip;
 
+	public:
+		int             m_CloseTime;
+
 		int             m_nAcceptTimes;
 		int             m_nConnectTimes;
 		int             m_nCloseTimes;
@@ -161,7 +164,11 @@ namespace Mogui
 		int             m_nIOCloseTimes;
 
 		int             m_UseTimes;
-	};
 
-	typedef boost::shared_ptr< CConnect > PtrConnect ;
+		int             m_nIoAccept;
+		int             m_nIoConnect;
+		int             m_nIoSend;
+		int             m_nIoRecv;
+		int             m_nIoDisconnect;
+	};
 }

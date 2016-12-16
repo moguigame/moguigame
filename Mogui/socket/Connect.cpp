@@ -1,3 +1,5 @@
+#include <ctime>
+
 #include "SocketDefine.h"
 
 #include "Connect.h"
@@ -9,6 +11,12 @@
 
 namespace Mogui
 {
+	extern void Mogui_InitLogger(const char* prefix, int level);
+	extern void Mogui_FiniLogger(void);
+	extern void Mogui_Log( char* szstr, ...);
+	extern void Mogui_Debug( char* szstr, ...);
+	extern void Mogui_Error( char* szstr, ...);
+
 	//允许超过一个的SOCKET绑定同一个本地地址端口，因为服务器关闭或者异常退出本地地址和端口进入TIME_WAIT状态，
 	//调用这个设置，可以方便服务器重启后在同一地址端口进行监听
 	static bool setreuseport( SOCKET socket )
@@ -156,9 +164,10 @@ namespace Mogui
 			GUID             GuidAcceptEX  = WSAID_ACCEPTEX;
 			DWORD            dwBytes;
 			SOCKET TempSocket = ::WSASocket(AF_INET,SOCK_STREAM,IPPROTO_TCP,NULL,0,WSA_FLAG_OVERLAPPED);
-			if ( WSAIoctl(TempSocket,SIO_GET_EXTENSION_FUNCTION_POINTER,&GuidAcceptEX,sizeof(GuidAcceptEX),&pFuncAcceptEX,sizeof(pFuncAcceptEX),&dwBytes,NULL,NULL) )
-			{
-				fprintf(stderr, "Error: WSAIoctl::LPFN_ACCEPTEX 创建失败 err=%d\n", WSAGetLastError() );
+			if ( WSAIoctl(TempSocket,SIO_GET_EXTENSION_FUNCTION_POINTER,&GuidAcceptEX,sizeof(GuidAcceptEX),&pFuncAcceptEX,sizeof(pFuncAcceptEX),&dwBytes,NULL,NULL) ){
+				int nRetError = WSAGetLastError();
+				Mogui_Error( "WSAIoctl::LPFN_ACCEPTEX 创建失败 err=%d ", nRetError );
+				fprintf(stderr, "Error: WSAIoctl::LPFN_ACCEPTEX 创建失败 err=%d\n", nRetError );
 				return false;
 			}
 		}
@@ -182,9 +191,10 @@ namespace Mogui
 			GUID             GuidGetAddrsEX  = WSAID_GETACCEPTEXSOCKADDRS;
 			DWORD            dwBytes;
 			SOCKET TempSocket = ::WSASocket(AF_INET,SOCK_STREAM,IPPROTO_TCP,NULL,0,WSA_FLAG_OVERLAPPED);
-			if ( WSAIoctl(TempSocket,SIO_GET_EXTENSION_FUNCTION_POINTER,&GuidGetAddrsEX,sizeof(GuidGetAddrsEX),&pFuncGetAcceptExSockAddrs,sizeof(pFuncGetAcceptExSockAddrs),&dwBytes,NULL,NULL) )
-			{
-				fprintf(stderr, "Error: WSAIoctl::LPFN_GETACCEPTEXSOCKADDRS 创建失败 err=%d\n", WSAGetLastError() );
+			if ( WSAIoctl(TempSocket,SIO_GET_EXTENSION_FUNCTION_POINTER,&GuidGetAddrsEX,sizeof(GuidGetAddrsEX),&pFuncGetAcceptExSockAddrs,sizeof(pFuncGetAcceptExSockAddrs),&dwBytes,NULL,NULL) ){
+				int nRetError = WSAGetLastError();
+				Mogui_Error( "WSAIoctl::LPFN_GETACCEPTEXSOCKADDRS 创建失败 err=%d ", nRetError );
+				fprintf(stderr, "Error: WSAIoctl::LPFN_GETACCEPTEXSOCKADDRS 创建失败 err=%d\n", nRetError );
 				return;
 			}
 		}
@@ -206,9 +216,10 @@ namespace Mogui
 			GUID             GuidConnectEX  = WSAID_CONNECTEX;
 			DWORD            dwBytes;
 			SOCKET TempSocket = ::WSASocket(AF_INET,SOCK_STREAM,IPPROTO_TCP,NULL,0,WSA_FLAG_OVERLAPPED);
-			if ( WSAIoctl(TempSocket,SIO_GET_EXTENSION_FUNCTION_POINTER,&GuidConnectEX,sizeof(GuidConnectEX),&pFuncConnectEx,sizeof(pFuncConnectEx),&dwBytes,NULL,NULL) )
-			{
-				fprintf(stderr, "Error: WSAIoctl::LPFN_CONNECTEX 创建失败 err=%d\n", WSAGetLastError() );
+			if ( WSAIoctl(TempSocket,SIO_GET_EXTENSION_FUNCTION_POINTER,&GuidConnectEX,sizeof(GuidConnectEX),&pFuncConnectEx,sizeof(pFuncConnectEx),&dwBytes,NULL,NULL) ){
+				int nRetError = WSAGetLastError();
+				Mogui_Error( "WSAIoctl::LPFN_CONNECTEX 创建失败 err=%d ", nRetError );
+				fprintf(stderr, "Error: WSAIoctl::LPFN_CONNECTEX 创建失败 err=%d\n", nRetError );
 				return false;
 			}
 		}
@@ -228,9 +239,10 @@ namespace Mogui
 			GUID             GuidDisconnectEX  = WSAID_DISCONNECTEX;
 			DWORD            dwBytes;
 			SOCKET TempSocket = ::WSASocket(AF_INET,SOCK_STREAM,IPPROTO_TCP,NULL,0,WSA_FLAG_OVERLAPPED);
-			if ( WSAIoctl(TempSocket,SIO_GET_EXTENSION_FUNCTION_POINTER,&GuidDisconnectEX,sizeof(GuidDisconnectEX),&pFuncDisconnectEX,sizeof(pFuncDisconnectEX),&dwBytes,NULL,NULL) )
-			{
-				fprintf(stderr, "Error: WSAIoctl::LPFN_DISCONNECTEX 创建失败 err=%d\n", WSAGetLastError() );
+			if ( WSAIoctl(TempSocket,SIO_GET_EXTENSION_FUNCTION_POINTER,&GuidDisconnectEX,sizeof(GuidDisconnectEX),&pFuncDisconnectEX,sizeof(pFuncDisconnectEX),&dwBytes,NULL,NULL) ){
+				int nRetError = WSAGetLastError();
+				Mogui_Error( "WSAIoctl::LPFN_DISCONNECTEX 创建失败 err=%d ", nRetError );
+				fprintf(stderr, "Error: WSAIoctl::LPFN_DISCONNECTEX 创建失败 err=%d\n", nRetError );
 				return false;
 			}
 		}
@@ -267,6 +279,8 @@ namespace Mogui
 		m_ol_disconnect.iotype = IOTYPE_DISCONNECT;
 		m_ol_disconnect.socket = this;
 
+		m_CloseTime = 0;
+
 		m_nAcceptTimes = 0;
 		m_nConnectTimes = 0;
 		m_nCloseTimes = 0;
@@ -280,6 +294,12 @@ namespace Mogui
 		m_nIOCloseTimes = 0;
 
 		m_UseTimes = 0;
+
+		m_nIoAccept = 0;
+		m_nIoConnect = 0;
+		m_nIoSend = 0;
+		m_nIoRecv = 0;
+		m_nIoDisconnect = 0;
 	}
 
 	CConnect::~CConnect( void ){
@@ -287,6 +307,8 @@ namespace Mogui
 
 	void CConnect::Close( void ){
 		CSelfLock l( m_lock );
+
+		Mogui_Debug( "CConnect::Close Connect=%p Status=%d \n", this,m_status );
 
 		++m_nCloseTimes;
 		if ( m_status != SS_INVALID ){
@@ -379,50 +401,15 @@ namespace Mogui
 
 	void CConnect::SetCallback( IConnectCallback * callback ){
 		assert(callback);
-		assert(m_connectpackets.Size() == 0);
+		//assert(m_connectpackets.Size() == 0);
 
 		++m_nSetCallBackTimes;
 		m_callback = callback;
 		if ( m_sockettype == ST_ACCEPTED ){
 			OnConnect();
 		}
-		fprintf(stdout, "CConnect::SetCallback=%p Connect=%p \n", callback,this);
-
-		//CPacketQueue delqueue;
-		//CPacket* packet = new CPacket( );
-
-		//if ( 0==packet ){
-		//	fprintf(stderr, "Error: CConnect::SetCallback new packet failed\n");
-		//}
-		//else
-		//{
-		//	packet->m_socket = this;
-		//	packet->m_used	 = 0;
-		//	packet->m_type	 = CPacket::PT_CONNECT;
-		//	packet->m_callback = callback;
-
-		//	CSelfLock l(m_lock);
-
-		//	if ( m_sockettype == ST_ACCEPTED ){
-		//		if ( SS_INVALID==m_status ){
-		//			fprintf(stderr, "Warning: CConnect::SetCallback at socket invalid time\n");
-		//			delete packet;
-		//		}
-		//		else{
-		//			m_dispatcher->OnRecvPacket(packet);
-		//			if( !ModifyRecv( ) ){
-		//				ModifyClose( );
-		//			}
-		//		}
-		//	}
-		//	else if ( m_sockettype == ST_CONNECTTO ){
-		//		m_connectpackets.PushPacket( packet );
-		//	}
-		//	else{
-		//		assert(0);
-		//	}
-		//}
-		//delqueue.DeleteClearAll();
+		//fprintf(stdout, "CConnect::SetCallback=%p Connect=%p \n", callback,this);
+		Mogui_Debug( "CConnect::SetCallback Connect=%p Status=%d Type=%d\n", this,m_status,m_sockettype );
 	}
 
 	std::string CConnect::GetPeerStringIp( void )
@@ -452,6 +439,8 @@ namespace Mogui
 
 	void CConnect::OnConnect(){
 		CSelfLock l(m_lock);
+
+		Mogui_Debug( "CConnect::OnConnect Connect=%p Status=%d \n", this,m_status );
 		
 		++m_nOnConnectTimes;
 		if ( m_status==SS_CONNECTING ){			
@@ -471,8 +460,9 @@ namespace Mogui
 
 	bool CConnect::OnClose( bool bactive )
 	{
-		fprintf(stdout, "CConnect::OnClose \n");
+		Mogui_Debug( "CConnect::OnClose Connect=%p Status=%d Active=%d \n", this,m_status,bactive );
 
+		m_CloseTime = time(NULL);
 		++m_nOnCloseTimes;
 		if ( m_callback ){
 			m_callback->OnClose( bactive );
@@ -541,55 +531,53 @@ namespace Mogui
 		return pos;
 	}
 
-	void CConnect::OnIOCPRecv( Ex_OVERLAPPED* pexol, int bytes )
-	{
+	void CConnect::OnIOCPRecv( Ex_OVERLAPPED* pexol, int bytes ){
+		CSelfLock l(m_lock);
+
+		Mogui_Debug( "CConnect::OnIOCPRecv Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
+
 		++m_nRecvTimes;
 		CPacketQueue recvpackets;
-		{
-			CSelfLock l(m_lock);
 
-			int pos = 0;
-			while( pos<bytes )
-			{
-				CPacket* packet = new CPacket( );
+		int pos = 0;
+		while( pos<bytes ){
+			CPacket* packet = new CPacket( );
 
-				if ( packet==0 )
-				{
-					fprintf(stderr, "Error: CConnect::OnIOCPRecv new packet failed\n");
-					break;
-				}
-
-				packet->m_socket = this;
-				packet->m_type   = CPacket::PT_DATA;
-				if ( bytes-pos>_MAX_BUFFER_LENGTH )
-				{
-					packet->m_used = _MAX_BUFFER_LENGTH;
-				}
-				else
-				{
-					packet->m_used = bytes-pos;
-				}
-
-				memcpy( packet->m_buffer, m_recvbuffer+pos, packet->m_used );
-				pos += packet->m_used;
-
-				recvpackets.PushPacket( packet );
+			if ( packet==0 ){
+				fprintf(stderr, "Error: CConnect::OnIOCPRecv new packet failed\n");
+				break;
 			}
 
-			m_recving = false;
-			--m_iocpref;
-
-			if( !ModifyRecv() )
-			{
-				ModifyClose( recvpackets );
+			packet->m_socket = this;
+			packet->m_type   = CPacket::PT_DATA;
+			if ( bytes-pos>_MAX_BUFFER_LENGTH ){
+				packet->m_used = _MAX_BUFFER_LENGTH;
+			}
+			else{
+				packet->m_used = bytes-pos;
 			}
 
-			m_dispatcher->OnRecvPacket( recvpackets );
+			memcpy( packet->m_buffer, m_recvbuffer+pos, packet->m_used );
+			pos += packet->m_used;
+
+			recvpackets.PushPacket( packet );
 		}
+
+		m_recving = false;
+		--m_iocpref;
+
+		if( !ModifyRecv() ){
+			ModifyClose( recvpackets );
+		}
+
+		m_dispatcher->OnRecvPacket( recvpackets );
 	}
 
-	void CConnect::OnIOCPSend( Ex_OVERLAPPED* pexol, int bytes )
-	{
+	void CConnect::OnIOCPSend( Ex_OVERLAPPED* pexol, int bytes ){
+		CSelfLock l(m_lock);
+
+		Mogui_Debug( "CConnect::OnIOCPSend Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
+
 		++m_nSendTimes;
 		CPacketQueue recvpackets;
 
@@ -620,28 +608,25 @@ namespace Mogui
 			break;
 		case CPacket::PT_CLOSE_ACTIVE:
 			{
-				CSelfLock l(m_lock);
-
 				m_sending = false;
 				--m_iocpref;
-				//if ( INVALID_SOCKET!=m_socket ){					
+
+				//CancelIoEx((HANDLE)m_socket,&m_ol_recv.overlapped);
+				//CancelIoEx((HANDLE)m_socket,&m_ol_send.overlapped);
+
+				//if ( INVALID_SOCKET!=m_socket ){
 					//::closesocket( m_socket );
 					//m_socket = INVALID_SOCKET;
 				//}
 
 				assert(m_closepackets.Size()==1);
-				CPacket* packet = m_closepackets.PopPacket( );
-				if( packet ){
-					m_dispatcher->OnRecvPacket( packet );
-				}
+				ModifyClose();
 			}
 			break;
 		case CPacket::PT_DATA:
 			{
 				CPacketQueue delqueue;
 				{
-					CSelfLock l(m_lock);
-
 					m_sending = false;
 					--m_iocpref;
 					if ( m_sendused>=bytes )
@@ -680,7 +665,8 @@ namespace Mogui
 	void CConnect::OnIOCPConnect( Ex_OVERLAPPED* pexol ){
 		CSelfLock l(m_lock);
 
-		fprintf(stdout, "Ticket=%d CConnect::OnIOCPConnect \n", GetTickCount() );
+		//fprintf(stdout, "Ticket=%d CConnect::OnIOCPConnect \n", GetTickCount() );
+		Mogui_Debug( "CConnect::OnIOCPConnect Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
 
 		++m_nConnectTimes;
 		--m_iocpref;
@@ -727,12 +713,13 @@ namespace Mogui
 		//	if( !ModifyRecv( ) ){
 		//		ModifyClose( );
 		//	}
-		//}
-		
+		//}		
 	}
 
 	void CConnect::OnIOCPAccept( Ex_OVERLAPPED* pexol ){
 		CSelfLock l(m_lock);
+
+		Mogui_Debug( "CConnect::OnIOCPAccept Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
 
 		++m_nAcceptTimes;
 		--m_iocpref;
@@ -784,10 +771,11 @@ namespace Mogui
 		m_dispatcher->OnRecvPacket( recvpackets );
 	}
 
-	void CConnect::OnIOCPClose( Ex_OVERLAPPED* pexol, DWORD dwErrorCode ){	
+	void CConnect::OnIOCPClose( Ex_OVERLAPPED* pexol, DWORD dwErrorCode ){
 		CSelfLock l(m_lock);
 
-		fprintf(stdout, "CConnect::OnIOCPClose ERROR  Type=%d Error=%d connect=%p \n", pexol->iotype,dwErrorCode,this );
+		Mogui_Debug( "CConnect::OnIOCPClose Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
+		//fprintf(stdout, "CConnect::OnIOCPClose ERROR  Type=%d Error=%d connect=%p \n", pexol->iotype,dwErrorCode,this );
 
 		++m_nIOCloseTimes;
 		if ( dwErrorCode==0 ){
@@ -795,13 +783,13 @@ namespace Mogui
 		}
 		--m_iocpref;
 		assert(m_iocpref>=0);
-
-		CPacketQueue recvpackets;
-		ModifyClose( recvpackets );
-		m_dispatcher->OnRecvPacket( recvpackets );
+		
+		ModifyClose();		
 	}
 
 	void CConnect::OnIODisConnect( Ex_OVERLAPPED* pexol ){
+		Mogui_Debug( "CConnect::OnIODisConnect Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
+
 		CPacket* packet = new CPacket( );
 		packet->m_socket = this;
 		packet->m_used	 = 0;
@@ -811,6 +799,8 @@ namespace Mogui
 
 	bool CConnect::WaitForAccepted( CDispatcher* dispatcher, SOCKET listenfd ){
 		CSelfLock lock(m_lock);
+
+		Mogui_Debug( "CConnect::WaitForAccepted Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
 
 		++m_UseTimes;
 		m_dispatcher = dispatcher;
@@ -835,12 +825,13 @@ namespace Mogui
 			return false;
 		}
 
-		fprintf(stdout, "CConnect::WaitForAccepted ioref=%d connect=%p \n", m_iocpref,this );
+		//fprintf(stdout, "CConnect::WaitForAccepted ioref=%d connect=%p \n", m_iocpref,this );
 
-		//assert(m_iocpref==0);
+		assert(m_iocpref==0);
 		//m_iocpref = 0;
 
 		++m_iocpref;
+		++m_nIoAccept;
 		memset(&m_ol_accept.overlapped, 0, sizeof(m_ol_accept.overlapped));		
 		if ( !CallFuncAcceptEx( listenfd, m_socket, m_recvbuffer, 0,sizeof(sockaddr_in)+16, sizeof(sockaddr_in)+16, NULL, &m_ol_accept.overlapped) ){
 			int nLastError = WSAGetLastError();
@@ -849,6 +840,7 @@ namespace Mogui
 				::closesocket(m_socket);
 				m_socket = INVALID_SOCKET;
 				--m_iocpref;
+				--m_nIoAccept;
 
 				return false;
 			}
@@ -859,6 +851,8 @@ namespace Mogui
 	bool CConnect::Connect( CDispatcher* dispatcher, const char* ip, unsigned short port, unsigned int recvsize, unsigned int sendsize){
 		CSelfLock lock(m_lock);
 
+		Mogui_Debug( "CConnect::Connect Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
+
 		++m_UseTimes;
 		m_dispatcher = dispatcher;
 		m_sockettype = ST_CONNECTTO;
@@ -868,7 +862,7 @@ namespace Mogui
 		//}
 		if ( m_socket == INVALID_SOCKET ){
 			m_socket = ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_IP, NULL, 0, WSA_FLAG_OVERLAPPED);
-			++S_CreateConnectSocket;			
+			++S_CreateConnectSocket;	
 		}		
 		if ( m_socket == INVALID_SOCKET ){
 			fprintf(stderr, "Error: CConnect::Connect socket创建失败 err=%d\n", GetLastError() );
@@ -888,7 +882,7 @@ namespace Mogui
 			if ( m_bindSuccess == 0 ){
 				fprintf(stderr, "Error: CConnect::Connect bind socket 失败 err=%d\n", GetLastError() );
 				return false;
-			}			
+			}
 		}
 		else {
 			m_bindSuccess = 1;
@@ -918,6 +912,7 @@ namespace Mogui
 		assert(m_iocpref==0);
 		//m_iocpref = 0;
 
+		++m_nIoConnect;
 		++m_iocpref;
 		DWORD dwSend = 0;
 		memset(&m_ol_connect.overlapped, 0, sizeof(m_ol_connect.overlapped));
@@ -928,6 +923,7 @@ namespace Mogui
 				::closesocket( m_socket );
 				m_socket = INVALID_SOCKET;
 				--m_iocpref;
+				--m_nIoConnect;
 
 				return false;
 			}
@@ -940,6 +936,8 @@ namespace Mogui
 	bool CConnect::Listen( CDispatcher* dispatcher, unsigned short port, unsigned int recvsize, unsigned int sendsize )
 	{
 		CSelfLock lock(m_lock);
+
+		Mogui_Debug( "CConnect::Listen Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
 
 		++m_UseTimes;
 		m_dispatcher = dispatcher;
@@ -1023,6 +1021,8 @@ namespace Mogui
 
 	void CConnect::TrueClose( bool bactive ){
 		CSelfLock l(m_lock);
+
+		Mogui_Debug( "CConnect::TrueClose Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
 		
 		if ( INVALID_SOCKET!=m_socket ){
 			::closesocket( m_socket );
@@ -1041,7 +1041,7 @@ namespace Mogui
 		m_longip   = 0;
 
 		m_sendpackets.DeleteClearAll();
-		m_connectpackets.DeleteClearAll();
+		//m_connectpackets.DeleteClearAll();
 		m_closepackets.DeleteClearAll();
 		m_logicpackets_buff.DeleteClearAll();
 
@@ -1060,9 +1060,10 @@ namespace Mogui
 	}
 
 	bool CConnect::ReuseClose( CIOCP* pIOCP ){
+		CSelfLock l(m_lock);
 		assert(INVALID_SOCKET!=m_socket);
 
-		CSelfLock l(m_lock);
+		Mogui_Debug( "CConnect::ReuseClose Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
 
 		m_callback  = 0;
 		m_logicused = 0;
@@ -1076,7 +1077,7 @@ namespace Mogui
 		m_longip   = 0;
 
 		m_sendpackets.DeleteClearAll();
-		m_connectpackets.DeleteClearAll();
+		//m_connectpackets.DeleteClearAll();
 		m_closepackets.DeleteClearAll();
 		m_logicpackets_buff.DeleteClearAll();
 
@@ -1092,6 +1093,7 @@ namespace Mogui
 		m_nOnCloseTimes = 0;
 		m_nIOCloseTimes = 0;
 		
+		++m_nIoDisconnect;
 		memset(&m_ol_disconnect.overlapped, 0, sizeof(m_ol_disconnect.overlapped));
 		m_ol_disconnect.flags = DWORD(pIOCP);
 		bool bRet = (CallDisconnectEx(m_socket,&m_ol_disconnect.overlapped,TF_REUSE_SOCKET,0)) ? true : false;
@@ -1101,108 +1103,82 @@ namespace Mogui
 				bRet = true;
 			}
 			else if ( nLastError==WSAENOTCONN ){
+				--m_nIoDisconnect;
 			}
 			else{
+				--m_nIoDisconnect;
 				fprintf(stderr, "Error: CConnect::CallDisconnectEx 失败 err = %d\n", nLastError );
+				Mogui_Error("Error: CConnect::CallDisconnectEx 失败 err = %d",nLastError);
 			}
 		}
 		return bRet;
 	}
 
-	bool CConnect::ModifySend( CPacketQueue& delpackets )
-	{
-		if ( m_status==SS_INVALID )
-		{
+	bool CConnect::ModifySend( CPacketQueue& delpackets ){
+		if ( m_status==SS_INVALID ){
 			return false;
 		}
-
-		if ( !m_sending )
-		{
+		Mogui_Debug( "CConnect::ModifySend Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
+		if ( !m_sending ){
 			CPacket* packet = 0;
 			bool	 berror = false;
 
-			if ( !m_connectpackets.IsEmpty() )
+			while ( (_MAX_SEND_BUFFER_LENGTH-m_sendused>=_MAX_BUFFER_LENGTH)
+				&& (packet=m_sendpackets.PopPacket()) )
 			{
-				assert(0);
+				memcpy( m_sendbuffer+m_sendused, packet->m_buffer, packet->m_used );
+				m_sendused += packet->m_used;
 
-				//m_ol_send.iobuffer.buf = m_sendbuffer;
-				//m_ol_send.iobuffer.len = 0;
-				//m_ol_send.packettype   = CPacket::PT_CONNECT;
-				//memset( &m_ol_send.overlapped, 0, sizeof(m_ol_send.overlapped) );
-
-				//m_sending = true;
-				//++m_iocpref;
-				//if( ::WSASend(m_socket, &m_ol_send.iobuffer, 1, &m_ol_send.sendbytes, 0, &m_ol_send.overlapped, NULL) != 0 )
-				//{
-				//	int nLastError = WSAGetLastError();
-				//	if ( nLastError!=ERROR_IO_PENDING && nLastError!=WSAEWOULDBLOCK )
-				//	{
-				//		fprintf(stderr, "Error: CConnect::ModifySend WSASend出现异常1，错误代码 err = %d\n", nLastError );
-				//		berror = true;
-				//		m_sending = false;
-				//		--m_iocpref;
-				//	}
-				//}
+				//delete packet;
+				delpackets.PushPacket( packet );
 			}
-			else
-			{
-				while ( (_MAX_SEND_BUFFER_LENGTH-m_sendused>=_MAX_BUFFER_LENGTH)
-					&& (packet=m_sendpackets.PopPacket()) )
+
+			if ( m_sendused>0 ){
+				m_ol_send.iobuffer.buf = m_sendbuffer;
+				m_ol_send.iobuffer.len = m_sendused;
+				m_ol_send.packettype   = CPacket::PT_DATA;
+				memset( &m_ol_send.overlapped, 0, sizeof(m_ol_send.overlapped) );
+
+				m_sending = true;
+				++m_iocpref;
+				++m_nIoSend;
+				if( ::WSASend(m_socket, &m_ol_send.iobuffer, 1, &m_ol_send.sendbytes, 0, &m_ol_send.overlapped, NULL) != 0 )
 				{
-					memcpy( m_sendbuffer+m_sendused, packet->m_buffer, packet->m_used );
-					m_sendused += packet->m_used;
-
-					//delete packet;
-					delpackets.PushPacket( packet );
-				}
-
-				if ( m_sendused>0 )
-				{
-					m_ol_send.iobuffer.buf = m_sendbuffer;
-					m_ol_send.iobuffer.len = m_sendused;
-					m_ol_send.packettype   = CPacket::PT_DATA;
-					memset( &m_ol_send.overlapped, 0, sizeof(m_ol_send.overlapped) );
-
-					m_sending = true;
-					++m_iocpref;
-					if( ::WSASend(m_socket, &m_ol_send.iobuffer, 1, &m_ol_send.sendbytes, 0, &m_ol_send.overlapped, NULL) != 0 )
+					int nLastError = WSAGetLastError();
+					if ( nLastError!=ERROR_IO_PENDING && nLastError!=WSAEWOULDBLOCK )
 					{
-						int nLastError = WSAGetLastError();
-						if ( nLastError!=ERROR_IO_PENDING && nLastError!=WSAEWOULDBLOCK )
-						{
-							fprintf(stderr, "Error: CConnect::ModifySend WSASend出现异常2，错误代码 err = %d\n", nLastError );
-							berror = true;
-							m_sending = false;
-							--m_iocpref;
-						}
-					}
-				}
-				else if ( !m_closepackets.IsEmpty() )
-				{
-					m_ol_send.iobuffer.buf = m_sendbuffer;
-					m_ol_send.iobuffer.len = 0;
-					m_ol_send.packettype   = CPacket::PT_CLOSE_ACTIVE;
-					memset( &m_ol_send.overlapped, 0, sizeof(m_ol_send.overlapped) );
-
-					m_sending = true;
-					++m_iocpref;
-					if( ::WSASend(m_socket, &m_ol_send.iobuffer, 1, &m_ol_send.sendbytes, 0, &m_ol_send.overlapped, NULL) != 0 )
-					{
-						int nLastError = WSAGetLastError();
-						if ( nLastError!=ERROR_IO_PENDING && nLastError!=WSAEWOULDBLOCK )
-						{
-							fprintf(stderr, "Error: CConnect::ModifySend WSASend出现异常3，错误代码 err = %d\n", nLastError );
-							berror = true;
-							m_sending = false;
-							--m_iocpref;
-						}
+						fprintf(stderr, "Error: CConnect::ModifySend WSASend出现异常2，错误代码 err = %d\n", nLastError );
+						berror = true;
+						m_sending = false;
+						--m_iocpref;
+						--m_nIoSend;
 					}
 				}
 			}
+			else if ( !m_closepackets.IsEmpty() ){
+				m_ol_send.iobuffer.buf = m_sendbuffer;
+				m_ol_send.iobuffer.len = 0;
+				m_ol_send.packettype   = CPacket::PT_CLOSE_ACTIVE;
+				memset( &m_ol_send.overlapped, 0, sizeof(m_ol_send.overlapped) );
 
+				m_sending = true;
+				++m_iocpref;
+				++m_nIoSend;
+				if( ::WSASend(m_socket, &m_ol_send.iobuffer, 1, &m_ol_send.sendbytes, 0, &m_ol_send.overlapped, NULL) != 0 )
+				{
+					int nLastError = WSAGetLastError();
+					if ( nLastError!=ERROR_IO_PENDING && nLastError!=WSAEWOULDBLOCK )
+					{
+						fprintf(stderr, "Error: CConnect::ModifySend WSASend出现异常3，错误代码 err = %d\n", nLastError );
+						berror = true;
+						m_sending = false;
+						--m_iocpref;
+						--m_nIoSend;
+					}
+				}
+			}
 			return !berror;
 		}
-
 		return true;
 	}
 
@@ -1212,6 +1188,9 @@ namespace Mogui
 		if ( m_status==SS_INVALID ){
 			return false;
 		}
+
+		Mogui_Debug( "CConnect::ModifyRecv Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
+
 		if ( !m_recving ){
 			m_ol_recv.iobuffer.buf = m_recvbuffer;
 			m_ol_recv.iobuffer.len = sizeof(m_recvbuffer);
@@ -1221,12 +1200,14 @@ namespace Mogui
 
 			m_recving = true;
 			++m_iocpref;
+			++m_nIoRecv;
 			if( ::WSARecv(m_socket, &m_ol_recv.iobuffer, 1, &m_ol_recv.recvbytes, &m_ol_recv.flags, &m_ol_recv.overlapped, NULL) != 0 ){
 				int nLastError = WSAGetLastError();
 				if ( nLastError!=ERROR_IO_PENDING && nLastError!=WSAEWOULDBLOCK ){
 					fprintf(stderr, "Error: CConnect::ModifyRecv WSARecv出现异常，错误代码 err = %d\n", nLastError );
 					m_recving = false;
 					--m_iocpref;
+					--m_nIoRecv;
 
 					return false;
 				}
@@ -1236,9 +1217,11 @@ namespace Mogui
 	}
 
 	//向当前CPacketQueue增加被动关闭SOCKET的消息
-	void CConnect::ModifyClose( CPacketQueue& recvpackets ){		
-		//if ( m_iocpref==0 ){
-		if ( SS_INVALID != m_status ){
+	void CConnect::ModifyClose( CPacketQueue& recvpackets ){
+		Mogui_Debug( "CConnect::ModifyClose() Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
+
+		m_status = SS_INVALID;
+		if ( m_iocpref == 0 ){
 			m_status = SS_INVALID;
 			CPacket* packet = m_closepackets.PopPacket( );
 			if( packet ){
@@ -1261,9 +1244,10 @@ namespace Mogui
 
 	//向消息派发中心增加被动关闭SOCKET的消息
 	void CConnect::ModifyClose( void ){
-		//if ( m_iocpref==0 ){
-		if ( SS_INVALID != m_status ){
-			m_status = SS_INVALID;
+		Mogui_Debug( "CConnect::ModifyClose Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
+
+		m_status = SS_INVALID;
+		if ( m_iocpref == 0 ){
 			CPacket* packet = m_closepackets.PopPacket( );
 			if( packet ){
 				m_dispatcher->OnRecvPacket( packet );
@@ -1285,6 +1269,8 @@ namespace Mogui
 
 	//向当前CPacketQueue增加接受SOCKET的消息
 	void CConnect::ModifyAccept( CPacketQueue& recvpackets ){
+		Mogui_Debug( "CConnect::ModifyAccept Connect=%p Status=%d IoRef=%d \n", this,m_status,m_iocpref );
+
 		CPacket* packet = new CPacket( );
 		if ( 0==packet ){
 			fprintf(stderr, "Error: CConnect::ModifyAccept new packet2 failed\n");
