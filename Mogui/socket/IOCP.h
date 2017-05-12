@@ -26,10 +26,9 @@ namespace Mogui
 
 		CConnect* Connect( const char* ip, unsigned short port, IConnectCallback* callback, unsigned int recvsize, unsigned int sendsize);
 		bool Listen( unsigned short port, unsigned int recvsize, unsigned int sendsize );
-		void Close( CConnect* socket, bool bactive );
-
+		void IOCPClose( CConnect* socket, bool bactive );
 		void OnIOCPDisConnect( CConnect* socket );
-		void OnIOAccept( CConnect* socket );
+		void OnIOCPAccept( CConnect* socket );
 
 		static void CALLBACK IOCP_IO( DWORD dwErrorCode, DWORD dwNumberOfBytesTransferred, LPOVERLAPPED lpOverlapped );
 
@@ -40,14 +39,14 @@ namespace Mogui
 
 		CConnect*             m_listener;
 
-		std::deque<CConnect*> m_accepts;
-		std::set<CConnect*>   m_acceptListen;
+		std::deque<CConnect*> m_acceptQueue;
+		std::set<CConnect*>   m_acceptWait;
 		std::set<CConnect*>   m_acceptInUse;
 
 		std::deque<CConnect*> m_connects;
 		std::set<CConnect*>   m_ConnectInUse;
 
 		CLock				  m_lock;
-		CCondition			  m_condition;		
+		CCondition			  m_condition;
 	};
 }

@@ -16,6 +16,7 @@
 #include "MemoryPool.h"
 #include "Thread.h"
 #include "Log.h"
+#include "MoguiTime.h"
 
 #pragma comment(lib,"Shlwapi.lib")
 
@@ -311,7 +312,7 @@ namespace Mogui{
 			localtime_s(&t,&curTime);
 
 			char curtime[256];
-			sprintf_s( curtime,256,"%04d-%02d-%02d %02d:%02d:%02d", t.tm_year+1900, t.tm_mon+1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
+			sprintf_s( curtime,256,"%04d-%02d-%02d %02d:%02d:%02d %-7I64d", t.tm_year+1900, t.tm_mon+1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec,CMoguiTime::GetProcessMilliSecond());
 
 			return std::string( curtime );
 		}
@@ -388,6 +389,28 @@ namespace Mogui{
 		g_mogui_logthread.Fini();
 	}
 
+	void Mogui_Debug( char* szstr, ...) {
+		if (!g_mogui_logthread.IsHaveInit()) {
+			return;
+		}
+		if (!g_mogui_logthread.IsLevelLog(LOGLEVEL_DEBUG)) {
+			return;
+		}
+
+		CLogThread::CLogPacket* packet = new CLogThread::CLogPacket();
+
+		packet->level = LOGLEVEL_DEBUG;
+		packet->type = 0;
+
+		va_list args;
+		va_start(args, szstr);
+		packet->len = _vsnprintf_s(packet->log, MAX_LOG_LEN, sizeof(packet->log) - 1, szstr, args);
+		va_end(args);
+		packet->log[packet->len] = 0;
+
+		g_mogui_logthread.PostLog(packet);
+	}
+
 	void Mogui_Log( char* szstr, ...) {
 		if (!g_mogui_logthread.IsHaveInit()) {
 			return;
@@ -410,17 +433,17 @@ namespace Mogui{
 		g_mogui_logthread.PostLog(packet);
 	}
 
-	void Mogui_Debug( char* szstr, ...) {
+	void Mogui_Warn( char* szstr, ...) {
 		if (!g_mogui_logthread.IsHaveInit()) {
 			return;
 		}
-		if (!g_mogui_logthread.IsLevelLog(LOGLEVEL_DEBUG)) {
+		if (!g_mogui_logthread.IsLevelLog(LOGLEVEL_WARN)) {
 			return;
 		}
 
 		CLogThread::CLogPacket* packet = new CLogThread::CLogPacket();
 
-		packet->level = LOGLEVEL_DEBUG;
+		packet->level = LOGLEVEL_WARN;
 		packet->type = 0;
 
 		va_list args;

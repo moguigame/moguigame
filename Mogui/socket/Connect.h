@@ -23,6 +23,13 @@ namespace Mogui
 		IOTYPE_DISCONNECT,
 	};
 
+	enum IOTYPE_PACKET_TYPE{
+		IOPACKTYPE_NONE,
+		IOPACKTYPE_DATA,
+		IOPACKTYPE_CONNECT,
+		IOPACKTYPE_CLOSE_ACTIVE
+	};
+
 	struct Ex_OVERLAPPED
 	{
 		OVERLAPPED	overlapped;
@@ -67,7 +74,7 @@ namespace Mogui
 			SS_LISTEN,        //SOCKETÕýÔÚ¼àÌýÖÐ
 		};
 
-		CConnect( void );
+		CConnect( int nSocketType=ST_UNKNOW );
 		virtual ~CConnect( void );
 
 		virtual void Close( void );
@@ -81,12 +88,12 @@ namespace Mogui
 		bool OnClose( bool bactive );
 		int	 OnMsg( CPacket* packet );
 
-		void OnIOCPRecv( Ex_OVERLAPPED* pexol, int bytes );
-		void OnIOCPSend( Ex_OVERLAPPED* pexol, int bytes );
-		void OnIOCPAccept( Ex_OVERLAPPED* pexol );
-		void OnIOCPConnect( Ex_OVERLAPPED* pexol );
-		void OnIOCPClose( Ex_OVERLAPPED* pexol, DWORD dwErrorCode );
-		void OnIODisConnect( Ex_OVERLAPPED* pexol );
+		void OnSocketIOCPRecv( Ex_OVERLAPPED* pexol, int bytes );
+		void OnSocketIOCPSend( Ex_OVERLAPPED* pexol, int bytes );
+		void OnSocketIOCPAccept( Ex_OVERLAPPED* pexol );
+		void OnSocketIOCPConnect( Ex_OVERLAPPED* pexol );
+		void OnSocketIOCPClose( Ex_OVERLAPPED* pexol, DWORD dwErrorCode );
+		void OnSocketIODisConnect( Ex_OVERLAPPED* pexol );
 
 		bool WaitForAccepted( CDispatcher* dispatcher, SOCKET listenfd );
 		bool Connect( CDispatcher* dispatcher, const char* ip, unsigned short port, unsigned int recvsize, unsigned int sendsize);
@@ -101,11 +108,11 @@ namespace Mogui
 		int  GetIoRef()const{ return m_iocpref; }
 
 	private:
-		bool ModifySend( CPacketQueue& delpackets );
+		bool ModifySend( void );
 		bool ModifyRecv( void );
-		void ModifyClose( CPacketQueue& recvpackets );
 		void ModifyClose( void );
-		void ModifyAccept( CPacketQueue& recvpackets );
+		//void ModifyAccept( void );
+		//void ModifyCloseByQueue( CPacketQueue& recvpackets );
 
 	public:
 		static int  S_CreateAcceptSocket;

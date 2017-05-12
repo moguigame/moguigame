@@ -16,7 +16,8 @@ using namespace Tool;
 CServer::CServer(void){
 	m_bIsInitOK = false;
 
-	InitLogger( "FlashPolicy_log", LOGLEVEL_ALL );
+	//InitLogger( "EchoServer", LOGLEVEL_ALL );
+	InitLogger( "EchoServer", LOGLEVEL_INFO | LOGLEVEL_WARN | LOGLEVEL_ERROR );
 
 	m_pPool = CreateConnectPool();
 	m_pPool->SetCallback( this );
@@ -73,11 +74,9 @@ void CServer::OnTimer( void ){
 	if( m_CurTime - m_CheckActiveTime >= 1 ){
 		m_CheckActiveTime = m_CurTime;
 		for( MapClientSocket::iterator itorClient = m_Clients.begin();itorClient != m_Clients.end();itorClient++ ){
-			CServerSocket* pSocket = itorClient->second;			
-			if( pSocket->IsConnected() ){
-				if ( int(pSocket)%10 == m_CurTime%10 ){
-					//pSocket->Close();
-				}		
+			CServerSocket* pSocket = itorClient->second;
+			if( pSocket->IsConnected() ){	
+				//pSocket->Close();
 			}
 		}
 	}
@@ -88,7 +87,7 @@ void CServer::OnAccept( IConnect* connect ){
 			CServerSocket* client = new CServerSocket( this, connect );
 			connect->SetCallback(client);
 			m_Clients.insert( make_pair(connect, client) );
-			DebugInfo("CServer::OnAccept connect=%p ClientSize=%d",connect,m_Clients.size() );
+			//DebugInfo("CServer::OnAccept connect=%p ClientSize=%d",connect,m_Clients.size() );
 		}
 		catch (...)	{
 			DebugError("CServer::OnAccept Out Memory");
@@ -100,7 +99,7 @@ void CServer::OnAccept( IConnect* connect ){
 }
 
 void CServer::OnClose( IConnect* pCconnect, bool bactive ){
-	//DebugInfo("CServer::DealCloseSocket start connect=%p ClientSize=%d",connect,m_Clients.size());
+	//DebugInfo("CServer::OnClose Connect Cconnect=%p",pCconnect);
 
 	MapClientSocket::iterator itorConnect = m_Clients.find( pCconnect );
 	if ( itorConnect != m_Clients.end() ){
@@ -110,13 +109,6 @@ void CServer::OnClose( IConnect* pCconnect, bool bactive ){
 		m_Clients.erase( itorConnect );
 	}
 	else{
-		DebugError("CServer::DealCloseSocket Can't Find In Client connect=%p ClientSize=%d",pCconnect,m_Clients.size());
-	}
-	//DebugInfo("CServer::DealCloseSocket Left ClientSize=%d",m_Clients.size() );
-
-	DebugInfo("CServer::DealCloseSocket connect=%p ClientSize=%d",pCconnect,m_Clients.size());
-}
-
-void CServer::DealCloseSocket( IConnect* connect ){
-	assert(0);
+		DebugError("CServer::OnClose Can't Find In Client connect=%p ClientSize=%d",pCconnect,m_Clients.size());
+	}	
 }

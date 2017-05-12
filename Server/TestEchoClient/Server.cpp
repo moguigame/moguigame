@@ -1,5 +1,7 @@
 #include <time.h>
 #include <cstdint>
+#include <algorithm>
+#include <numeric>
 
 #include "Tool.h"
 
@@ -16,16 +18,17 @@ using namespace Tool;
 CServer::CServer(void){
 	m_bIsInitOK = false;
 
-	InitLogger( "FlashPolicy_log", LOGLEVEL_ALL );
+	//InitLogger( "EchoClient", LOGLEVEL_ALL );
+	InitLogger( "EchoServer", LOGLEVEL_INFO | LOGLEVEL_WARN | LOGLEVEL_ERROR );
 
 	m_pPool = CreateConnectPool();
 	m_pPool->SetCallback( this );
-	m_pPool->Start( 0, 0, 10000);
+	m_pPool->Start( 0, 0, 5000);
 
 	m_CurTime = time( NULL );
-	m_CheckActiveTime = m_CurTime;
+	m_CheckActiveTime = 0;
 
-	m_vecConnects.resize(10000);
+	m_vecConnects.resize(5000);
 	for (int nCount=0;nCount<m_vecConnects.size();++nCount){
 		m_vecConnects[nCount] = new CClientSocket(this);
 	}
@@ -74,18 +77,55 @@ void CServer::OnTimer( void ){
 		return ;
 	}
 	m_CurTime = time( NULL );
-	if( m_CurTime - m_CheckActiveTime >= 20 ){
+	if( m_CurTime - m_CheckActiveTime >= 1 ){
 		m_CheckActiveTime = m_CurTime;
+		int SocketCount[10]={0};
+
 		for (int nCount=0;nCount<m_vecConnects.size();++nCount){
 			CClientSocket* pClient = m_vecConnects[nCount];
 			int SocketStatus = pClient->GetSocketStatus();
+			SocketCount[SocketStatus]++;		
 			if ( SocketStatus==CClientSocket::SOCKET_ST_CLOSED || SocketStatus==CClientSocket::SOCKET_ST_NONE ){
-				pClient->Connect("192.168.2.166",6000);
+				pClient->Connect("127.0.0.1",6000);
 			}
-			else if ( Tool::GetChangce(10,10) && SocketStatus==CClientSocket::SOCKET_ST_CONNECTED ){
+			//else if ( Tool::GetChangce(5,1) && SocketStatus==CClientSocket::SOCKET_ST_CONNECTED ){
+			//	pClient->Close();
+			//}
+			else if ( SocketStatus==CClientSocket::SOCKET_ST_CONNECTED ){
 				pClient->Close();
 			}
 		}
+
+		//for (int nCount=0;nCount<m_vecConnects.size();++nCount){
+		//	CClientSocket* pClient = m_vecConnects[nCount];
+		//	int SocketStatus = pClient->GetSocketStatus();
+		//	SocketCount[SocketStatus]++;
+		//	if ( SocketStatus==CClientSocket::SOCKET_ST_CONNECTED ){
+		//		pClient->Close();
+		//	}
+		//}
+		//for (int nCount=0;nCount<m_vecConnects.size();++nCount){
+		//	CClientSocket* pClient = m_vecConnects[nCount];
+		//	int SocketStatus = pClient->GetSocketStatus();
+		//	if ( std::accumulate(SocketCount+CClientSocket::SOCKET_ST_CONNECTING,SocketCount+CClientSocket::SOCKET_ST_CLOSED,0)==0 && SocketStatus==CClientSocket::SOCKET_ST_NONE ){
+		//		pClient->Connect("127.0.0.1",6000);
+		//		break;
+		//	}
+		//}
+
+		
+		//for (int nCount=0;nCount<m_vecConnects.size();++nCount){
+		//	CClientSocket* pClient = m_vecConnects[nCount];
+		//	int SocketStatus = pClient->GetSocketStatus();
+		//	if ( SocketStatus==CClientSocket::SOCKET_ST_CONNECTED ){
+		//		pClient->Close();
+		//	}
+		//}
+		//static int s_ConnectIdx = 0;
+		//m_vecConnects[s_ConnectIdx]->Connect("127.0.0.1",6000);
+		//s_ConnectIdx = (s_ConnectIdx+1)%5;
+
+		//fprintf(stdout, "%s\n",ArrayToString(SocketCount,10,5," ").c_str());
 	}
 }
 void CServer::OnAccept( IConnect* connect ){
@@ -103,7 +143,7 @@ void CServer::OnAccept( IConnect* connect ){
 }
 
 void CServer::OnClose( IConnect* nocallbackconnect, bool bactive ){
-	//DebugInfo("CServer::OnClose NoCallBack Connect");
+	//DebugInfo("CServer::OnClose Connect=%p",nocallbackconnect);
 }
 
 Mogui::IConnect* CServer::Connect(const char* strIP,int nPort,Mogui::IConnectCallback* callback){

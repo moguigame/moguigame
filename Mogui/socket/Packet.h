@@ -1,7 +1,9 @@
 #pragma once
 
 #include "MemoryPool.h"
+#include "MoguiTime.h"
 #include "SocketDefine.h"
+#include "MoguiFunc.h"
 
 namespace Mogui{
 
@@ -53,7 +55,7 @@ namespace Mogui{
 		void PushPacket( CPacket* packet ){
 			if ( packet ){
 				packet->m_next      = 0;
-				packet->m_starttick = GetTickCount64();
+				packet->m_starttick = CMoguiTime::GetProcessMilliSecond();
 
 				if ( m_tail ){
 					m_tail->m_next = packet;
@@ -107,7 +109,7 @@ namespace Mogui{
 		void DeleteClearAll( void ){
 			CPacket* packet = 0;
 			while ( (packet=PopPacket()) ){
-				delete packet;
+				safe_delete(packet);
 			}
 			assert( m_InPacket == m_OutPacket);
 		}
@@ -115,7 +117,7 @@ namespace Mogui{
 		void Clear( void ){
 			CPacket* packet = 0;
 			while ( (packet=PopPacket()) ){
-				delete packet;
+				safe_delete(packet);
 			}
 			assert( m_InPacket == m_OutPacket);
 		}

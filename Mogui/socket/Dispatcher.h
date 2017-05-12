@@ -21,7 +21,7 @@ namespace Mogui
 		bool Init( CConnectPool* cpool );
 		void Fini( void );
 
-		void OnRecvPacket( CPacketQueue& packets );
+		//void OnRecvPacketQueue( CPacketQueue& packets );
 		void OnRecvPacket( CPacket* packet );
 
 		void AddForbidIP( const char* ip );
@@ -45,7 +45,6 @@ namespace Mogui
 		CPacketQueue	            m_packets;
 		volatile int     		    m_lasttime;
 
-		int                         m_StartTime;
 		long long                   m_TotalFinishPacket;
 		long long                   m_TotalWaitTime;
 

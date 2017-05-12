@@ -41,19 +41,19 @@ namespace Mogui
 		virtual void OnTimer( void );
 
 		// 接收到连接
-		virtual void OnAccept( CConnect* connect );
+		virtual void OnPoolAccept( CConnect* connect );
 
 		// 没有设置callback的IConnect关闭的时候会回调这个事件,由 nocallback 标识
-		virtual void OnClose( CConnect* connect, bool bactive, bool nocallback );
+		virtual void OnPoolCloseSocket( CConnect* connect, bool bactive, bool nocallback );
 
 		// 没有任何消息的时候
 		void OnIdle( void );
 
 	private:
 		CLock                   m_poolLock;
-		IConnectPoolCallback*	m_callback;
+		IConnectPoolCallback*	m_poolcallback;
 		CDispatcher*			m_dispatcher;
 		CIOCP*					m_iocp;
-		int						m_status;
+		int						m_poolstatus;
 	};
 }

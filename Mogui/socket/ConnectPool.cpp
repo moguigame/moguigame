@@ -4,6 +4,7 @@
 #include "Connect.h"
 #include "Dispatcher.h"
 #include "IOCP.h"
+#include "Log.h"
 
 namespace Mogui
 {
@@ -12,17 +13,19 @@ namespace Mogui
 	extern void Mogui_Log( char* szstr, ...);
 	extern void Mogui_Debug( char* szstr, ...);
 	extern void Mogui_Error( char* szstr, ...);
+	extern void Mogui_Warn( char* szstr, ...);
 
 	static CLock connectpool_lock;
 	static WSADATA wsa_data;
 	static unsigned long long connectpool_count=0;
 
-	IConnectPool* CreateConnectPool( void )
-	{
-		CSelfLock l( connectpool_lock );
+	IConnectPool* CreateConnectPool( void ){
+		CMoguiTime::Init();
 
+		CSelfLock l( connectpool_lock );
 		if ( connectpool_count==0 ){
-			Mogui_InitLogger("Mogui",15);
+			//Mogui_InitLogger("Mogui",LOGLEVEL_DEBUG | LOGLEVEL_INFO | LOGLEVEL_WARN | LOGLEVEL_ERROR);
+			Mogui_InitLogger("Mogui",LOGLEVEL_INFO | LOGLEVEL_WARN | LOGLEVEL_ERROR);
 
 			if ( ::WSAStartup( MAKEWORD(2, 2), &wsa_data ) != 0 ){
 				fprintf(stderr, "Error: CreateConnectPool init wsastartup failed\n");
@@ -36,20 +39,17 @@ namespace Mogui
 			Mogui_Log("\n\n\n\n\n\n\n\n Version %s \n",GetSocketBaseVersion().c_str());
 			fprintf(stderr, "Version %s \n",GetSocketBaseVersion().c_str());
 		}
-
 		++connectpool_count;
 
 		return new CConnectPool();
 	}
 
-	void DestoryConnectPool( IConnectPool* ppool )
-	{
+	void DestoryConnectPool( IConnectPool* ppool ){
 		CSelfLock l( connectpool_lock );
 		safe_delete(ppool);
 
 		if ( --connectpool_count==0 ){
 			::WSACleanup( );
-
 			Mogui_FiniLogger();
 		}
 	}
@@ -59,7 +59,7 @@ namespace Mogui
 	}
 
 	CConnectPool::CConnectPool( void )
-		: m_callback( 0 ), m_status( CPS_NONE )
+		: m_poolcallback( 0 ), m_poolstatus( CPS_NONE )
 	{
 		m_dispatcher= new CDispatcher( );
 		m_iocp		= new CIOCP( );
@@ -73,38 +73,40 @@ namespace Mogui
 		safe_delete(m_iocp);
 		safe_delete(m_dispatcher);
 
-		m_status = CPS_NONE;
+		m_poolstatus = CPS_NONE;
 	}
 
 	void CConnectPool::SetCallback( IConnectPoolCallback* callback )
 	{
 		CSelfLock l( m_poolLock );
 
-		if( !callback || m_status!=CPS_NONE )	return;
+		if( !callback || m_poolstatus!=CPS_NONE )	return;
 
-		m_callback	= callback;
-		m_status	= CPS_CALLBACK;
+		m_poolcallback	= callback;
+		m_poolstatus	= CPS_CALLBACK;
 	}
 
 	bool CConnectPool::Start( int port, int clientcnt, int connectcnt )
 	{
 		CSelfLock l( m_poolLock );
-
-		if ( m_status != CPS_CALLBACK )
+		
+		if ( m_poolstatus != CPS_CALLBACK )
 		{
-			fprintf(stderr, "Error: Start status!=CPS_CALLBACK  status=%d",m_status);
+			fprintf(stderr, "Error: Start status!=CPS_CALLBACK  status=%d",m_poolstatus);
 			return false;
 		}
 
 		if ( !m_dispatcher->Init( this ) )
 		{
 			fprintf(stderr, "Error: Dispatch Init");
+			Mogui_Error("Dispatch Init");
 			return false;
 		}
 
 		if ( !m_iocp->Init( m_dispatcher, clientcnt, connectcnt ) )
 		{
 			fprintf(stderr, "Error: IOCP Init");
+			Mogui_Error("IOCP Init");
 			return false;
 		}
 
@@ -112,10 +114,11 @@ namespace Mogui
 		if ( port>0 && !m_iocp->Listen( port, _DEFAULT_RECV_BUFF, _DEFAULT_SEND_BUFF ) )
 		{
 			fprintf(stderr, "Error: IOCP Listen Port=%d",port);
+			Mogui_Error("IOCP Listen Port=%d",port);
 			return false;
 		}
 
-		m_status = CPS_START;
+		m_poolstatus = CPS_START;
 
 		return true;
 	}
@@ -134,13 +137,13 @@ namespace Mogui
 	{
 		CSelfLock l( m_poolLock );
 
-		if ( m_status == CPS_START )
+		if ( m_poolstatus == CPS_START )
 		{
 			m_iocp->Fini( );
 			m_dispatcher->Fini( );
 
-			if( m_callback )	m_status = CPS_CALLBACK;
-			else				m_status = CPS_NONE;
+			if( m_poolcallback ) m_poolstatus = CPS_CALLBACK;
+			else				 m_poolstatus = CPS_NONE;
 		}
 	}
 
@@ -148,8 +151,11 @@ namespace Mogui
 	{
 		CSelfLock l( m_poolLock );
 
-		if ( m_status != CPS_START ){
+		Mogui_Debug("CConnectPool::Connect Ip=%s,Port=%d",ip,port);
+
+		if ( m_poolstatus != CPS_START ){
 			fprintf(stderr, "Error: Status Error Can't Connect...");
+			Mogui_Error("Status Error Can't Connect...");
 			return 0;
 		}
 		if ( !callback ){
@@ -161,24 +167,28 @@ namespace Mogui
 	}
 
 	bool CConnectPool::OnPriorityEvent( void ){
-		return m_callback->OnPriorityEvent( );
+		return m_poolcallback->OnPriorityEvent( );
 	}
 
 	void CConnectPool::OnTimer( void ){
-		m_callback->OnTimer( );
+		m_poolcallback->OnTimer( );
 	}
 
-	void CConnectPool::OnAccept( CConnect* connect ){
-		m_callback->OnAccept( connect );
+	void CConnectPool::OnPoolAccept( CConnect* connect ){
+		Mogui_Debug("CConnectPool::OnPoolAccept Socket=%p",connect);
+
+		m_poolcallback->OnAccept( connect );
 	}
 
-	void CConnectPool::OnClose( CConnect* connect, bool bactive, bool nocallback ){		
-		m_callback->OnClose(connect, bactive);		
-		m_iocp->Close( connect, bactive );
+	void CConnectPool::OnPoolCloseSocket( CConnect* connect, bool bactive, bool nocallback ){
+		Mogui_Debug("CConnectPool::OnPoolCloseSocket Socket=%p bActive=%d bCallBack=%d",connect,bactive,nocallback);
+
+		m_poolcallback->OnClose(connect, bactive);
+		m_iocp->IOCPClose( connect, bactive );
 	}
 
 	void CConnectPool::OnIdle( void ){
-		m_callback->OnIdle( );
+		m_poolcallback->OnIdle( );
 	}
 
 	bool IConnectPoolCallback::OnPriorityEvent( void ){

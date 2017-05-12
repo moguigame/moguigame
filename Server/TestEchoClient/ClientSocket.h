@@ -19,7 +19,7 @@ public:
 	virtual int              OnMsg( const char* buf, int len );
 
 	void                     Close();
-	void                     Connect(const char* strIP,int nPort);
+	void                     Connect(const char* strIP,int nPort);	
 
 	bool                     IsConnected() const { return m_SocketState == SOCKET_ST_CONNECTED; }
 	int                      GetSocketStatus()const{ return m_SocketState; }
@@ -28,10 +28,12 @@ public:
 
 protected:
 	CServer*	     m_pServer;
-	Mogui::IConnect* m_pConnect;	
+	Mogui::IConnect* m_pConnect;
 	int			     m_SocketState;
 	time_t           m_ConnectTime;
 
 	std::string      m_strIP;
 	int              m_nPort;
+
+	int              m_ConnectTicket;
 };

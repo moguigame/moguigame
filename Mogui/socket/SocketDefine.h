@@ -14,10 +14,6 @@
 
 namespace Mogui
 {
-	template<class T> void safe_delete(T* pData){
-		if ( pData ){ delete pData;	pData = nullptr;}
-	}
-
 	// socket系统接收缓存默认长度,
 	const unsigned int _DEFAULT_RECV_BUFF		= 8192;
 	// socket系统发送缓存默认长度,

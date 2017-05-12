@@ -20,7 +20,6 @@ private:
 	void OnClose(Mogui::IConnect* nocallbackconnect, bool bactive);
 
 public:
-	void DealCloseSocket(Mogui::IConnect* connect);
 	Mogui::IConnect* Connect(const char* strIP,int nPort,Mogui::IConnectCallback* callback);
 
 	inline void        DebugError(const char* logstr,...);

@@ -22,8 +22,6 @@ private:
 	void OnClose(Mogui::IConnect* nocallbackconnect, bool bactive);
 
 public:
-	void DealCloseSocket(Mogui::IConnect* connect);
-
 	inline void        DebugError(const char* logstr,...);
 	inline void        DebugInfo(const char* logstr,...);
 

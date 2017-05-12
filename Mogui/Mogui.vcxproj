@@ -97,6 +97,7 @@ copy release\\Mogui.lib ..\\libs\\Mogui.lib</Command>
     <ClInclude Include="Include\Common\Log.h" />
     <ClInclude Include="Include\Common\MemoryPool.h" />
     <ClInclude Include="Include\Common\MoguiData.h" />
+    <ClInclude Include="Include\Common\MoguiTime.h" />
     <ClInclude Include="Include\Common\MutexObject.h" />
     <ClInclude Include="Include\Common\RWLock.h" />
     <ClInclude Include="Include\Common\Semaphore.h" />
@@ -118,6 +119,7 @@ copy release\\Mogui.lib ..\\libs\\Mogui.lib</Command>
     <ClCompile Include="src\ConditionVariable.cpp" />
     <ClCompile Include="src\Lock.cpp" />
     <ClCompile Include="src\Log.cpp" />
+    <ClCompile Include="src\MoguiTime.cpp" />
     <ClCompile Include="src\MutexObject.cpp" />
     <ClCompile Include="src\RWLock.cpp" />
     <ClCompile Include="src\Semaphore.cpp" />

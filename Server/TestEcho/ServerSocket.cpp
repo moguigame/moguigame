@@ -36,7 +36,7 @@ void CServerSocket::OnConnect( void ){
 }
 
 int CServerSocket::OnMsg( const char* buf, int len ){	
-	//this->m_pConnect->Send( buf, len );
+	this->m_pConnect->Send( buf, len );
 	return len;
 }
 void CServerSocket::OnClose( bool bactive ){
