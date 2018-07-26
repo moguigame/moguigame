@@ -193,10 +193,10 @@ namespace Mogui
 		}
 
 		Mogui_Log("CIOCP::Listen m_acceptQueue=%d m_acceptWait=%d acceptInUse=%d",m_acceptQueue.size(),m_acceptWait.size(),m_acceptInUse.size() );
-		fprintf(stdout, "CIOCP::Listen m_acceptQueue=%d m_acceptWait=%d acceptInUse=%d",m_acceptQueue.size(),m_acceptWait.size(),m_acceptInUse.size() );
+		fprintf(stdout, "CIOCP::Listen m_acceptQueue=%d m_acceptWait=%d acceptInUse=%d \n",m_acceptQueue.size(),m_acceptWait.size(),m_acceptInUse.size() );
 
 		Mogui_Log("CIOCP::Listen CreateAccept=%d",CConnect::S_CreateAcceptSocket );
-		fprintf(stdout, "CIOCP::Listen CreateAccept=%d",CConnect::S_CreateAcceptSocket );
+		fprintf(stdout, "CIOCP::Listen CreateAccept=%d \n",CConnect::S_CreateAcceptSocket );
 
 		return true;
 	}

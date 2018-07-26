@@ -92,20 +92,20 @@ namespace Mogui
 		
 		if ( m_poolstatus != CPS_CALLBACK )
 		{
-			fprintf(stderr, "Error: Start status!=CPS_CALLBACK  status=%d",m_poolstatus);
+			fprintf(stderr, "Error: Start status!=CPS_CALLBACK  status=%d \n",m_poolstatus);
 			return false;
 		}
 
 		if ( !m_dispatcher->Init( this ) )
 		{
-			fprintf(stderr, "Error: Dispatch Init");
+			fprintf(stderr, "Error: Dispatch Init \n");
 			Mogui_Error("Dispatch Init");
 			return false;
 		}
 
 		if ( !m_iocp->Init( m_dispatcher, clientcnt, connectcnt ) )
 		{
-			fprintf(stderr, "Error: IOCP Init");
+			fprintf(stderr, "Error: IOCP Init \n");
 			Mogui_Error("IOCP Init");
 			return false;
 		}
@@ -113,7 +113,7 @@ namespace Mogui
 		m_dispatcher->SetIOCP(m_iocp);
 		if ( port>0 && !m_iocp->Listen( port, _DEFAULT_RECV_BUFF, _DEFAULT_SEND_BUFF ) )
 		{
-			fprintf(stderr, "Error: IOCP Listen Port=%d",port);
+			fprintf(stderr, "Error: IOCP Listen Port=%d \n",port);
 			Mogui_Error("IOCP Listen Port=%d",port);
 			return false;
 		}
@@ -154,7 +154,7 @@ namespace Mogui
 		Mogui_Debug("CConnectPool::Connect Ip=%s,Port=%d",ip,port);
 
 		if ( m_poolstatus != CPS_START ){
-			fprintf(stderr, "Error: Status Error Can't Connect...");
+			fprintf(stderr, "Error: Status Error Can't Connect... \n");
 			Mogui_Error("Status Error Can't Connect...");
 			return 0;
 		}
