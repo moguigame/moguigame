@@ -19,13 +19,13 @@ namespace Mogui
 	static WSADATA wsa_data;
 	static unsigned long long connectpool_count=0;
 
-	IConnectPool* CreateConnectPool( void ){
+	IConnectPool* CreateConnectPool( int nLevel ){
 		CMoguiTime::Init();
 
 		CSelfLock l( connectpool_lock );
 		if ( connectpool_count==0 ){
-			//Mogui_InitLogger("Mogui",LOGLEVEL_DEBUG | LOGLEVEL_INFO | LOGLEVEL_WARN | LOGLEVEL_ERROR);
-			Mogui_InitLogger("Mogui",LOGLEVEL_INFO | LOGLEVEL_WARN | LOGLEVEL_ERROR);
+			Mogui_InitLogger("Mogui",nLevel /*LOGLEVEL_DEBUG | LOGLEVEL_INFO | LOGLEVEL_WARN | LOGLEVEL_ERROR*/);
+			//Mogui_InitLogger("Mogui",LOGLEVEL_INFO | LOGLEVEL_WARN | LOGLEVEL_ERROR);
 
 			if ( ::WSAStartup( MAKEWORD(2, 2), &wsa_data ) != 0 ){
 				fprintf(stderr, "Error: CreateConnectPool init wsastartup failed\n");

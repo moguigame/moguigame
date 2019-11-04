@@ -312,7 +312,7 @@ namespace Mogui{
 			localtime_s(&t,&curTime);
 
 			char curtime[256];
-			sprintf_s( curtime,256,"%04d-%02d-%02d %02d:%02d:%02d %-7I64d", t.tm_year+1900, t.tm_mon+1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec,CMoguiTime::GetProcessMilliSecond());
+			sprintf_s( curtime,256,"%04d-%02d-%02d %02d:%02d:%02d %-12I64d", t.tm_year+1900, t.tm_mon+1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec,CMoguiTime::GetProcessMilliSecond());
 
 			return std::string( curtime );
 		}

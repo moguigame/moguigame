@@ -17,7 +17,7 @@ namespace Mogui{
 	class IConnectCallback;			//IConnect回调，实现该接口可以捕获Socket断开和收到数据包消息。	
 
 	// 创建连接池对象
-	IConnectPool*	CreateConnectPool( void );
+	IConnectPool*	CreateConnectPool( int nLevel=15 );
 
 	// 销毁连接池对象
 	void			DestoryConnectPool( IConnectPool* ppool );

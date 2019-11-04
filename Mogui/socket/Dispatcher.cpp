@@ -170,21 +170,21 @@ namespace Mogui
 					nPacketSize = m_packets.Size();
 				}
 
-				fprintf(stderr, "\nPacket In=%I64d Out=%I64d Diff=%I64d Size=%d \n",InPacket,OutPacket,InPacket-OutPacket,nPacketSize );
-				Mogui_Log(" ");
-				Mogui_Log("Packet In=%I64d Out=%I64d Diff=%I64d Size=%d ",InPacket,OutPacket,InPacket-OutPacket,nPacketSize);
+				//fprintf(stderr, "\nPacket In=%I64d Out=%I64d Diff=%I64d Size=%d \n",InPacket,OutPacket,InPacket-OutPacket,nPacketSize );
+				//Mogui_Log(" ");
+				//Mogui_Log("Packet In=%I64d Out=%I64d Diff=%I64d Size=%d ",InPacket,OutPacket,InPacket-OutPacket,nPacketSize);
 
-				fprintf(stderr, "Packet FinishPacket=%I64d AverageTime=%I64d Speed=%I64d \n",
-					m_TotalFinishPacket,m_TotalWaitTime/max(1,m_TotalFinishPacket),m_TotalFinishPacket/std::max<int>(1,nowms-s_startTime) );
-				Mogui_Log("Packet FinishPacket=%I64d AverageTime=%I64d Speed=%I64d",
-					m_TotalFinishPacket,m_TotalWaitTime/max(1,m_TotalFinishPacket),m_TotalFinishPacket/std::max<int>(1,nowms-s_startTime) );
+				//fprintf(stderr, "Packet FinishPacket=%I64d AverageTime=%I64d Speed=%I64d \n",
+				//	m_TotalFinishPacket,m_TotalWaitTime/max(1,m_TotalFinishPacket),m_TotalFinishPacket/std::max<int>(1,nowms-s_startTime) );
+				//Mogui_Log("Packet FinishPacket=%I64d AverageTime=%I64d Speed=%I64d",
+				//	m_TotalFinishPacket,m_TotalWaitTime/max(1,m_TotalFinishPacket),m_TotalFinishPacket/std::max<int>(1,nowms-s_startTime) );
 
-				fprintf(stderr,"CPacket=%d Use=%d New=%I64d Delete=%I64d Diff=%I64d \n\n",
-					CPacket::GetTotalCount(),CPacket::GetUseCount(),CPacket::GetNewTimes(),CPacket::GetDeleteTimes(),
-					CPacket::GetNewTimes()-CPacket::GetDeleteTimes() );
-				Mogui_Log("CPacket=%d Use=%d New=%I64d Delete=%I64d Diff=%I64d ",
-					CPacket::GetTotalCount(),CPacket::GetUseCount(),CPacket::GetNewTimes(),CPacket::GetDeleteTimes(),CPacket::GetNewTimes()-CPacket::GetDeleteTimes());
-				Mogui_Log(" ");
+				//fprintf(stderr,"CPacket=%d Use=%d New=%I64d Delete=%I64d Diff=%I64d \n\n",
+				//	CPacket::GetTotalCount(),CPacket::GetUseCount(),CPacket::GetNewTimes(),CPacket::GetDeleteTimes(),
+				//	CPacket::GetNewTimes()-CPacket::GetDeleteTimes() );
+				//Mogui_Log("CPacket=%d Use=%d New=%I64d Delete=%I64d Diff=%I64d ",
+				//	CPacket::GetTotalCount(),CPacket::GetUseCount(),CPacket::GetNewTimes(),CPacket::GetDeleteTimes(),CPacket::GetNewTimes()-CPacket::GetDeleteTimes());
+				//Mogui_Log(" ");
 			}
 		}
 	}
